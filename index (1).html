@@ -1804,6 +1804,34 @@ img { -webkit-user-drag: none; }
   max-width: 610px;
 }
 
+/* ══════════════════════════════════════
+   إضافات CSS مطلوبة للنسخة الجديدة (Firebase)
+══════════════════════════════════════ */
+
+/* نقطة حالة الاتصال — تفضل خضرا وهادية، تتلون حمرا لو الاتصال اتقطع */
+.conn-status-dot {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  z-index: 300;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #4ADE80;
+  box-shadow: 0 0 4px rgba(74,222,128,0.6);
+  opacity: 0.55;
+  transition: background .3s, box-shadow .3s;
+  pointer-events: none;
+}
+.conn-status-dot.offline {
+  background: #F87171;
+  box-shadow: 0 0 6px rgba(248,113,113,0.8);
+  opacity: 0.9;
+}
+
+/* اللوجو — مؤشر إنه قابل للمس (بدون ما يبان أدمن) */
+#logoTapTarget { cursor: default; -webkit-tap-highlight-color: transparent; }
+
 </style>
 </head>
 <body>
@@ -1813,13 +1841,12 @@ img { -webkit-user-drag: none; }
   <button class="kiosk-start-btn" onclick="startKiosk()">بدء العرض</button>
 </div>
 
-<button id="adminGearBtn" onclick="openAdminLogin()" aria-label="لوحة التحكم">⚙️</button>
-
 <div class="admin-modal-backdrop" id="adminPinBackdrop">
   <div class="admin-pin-box">
-    <h3>لوحة التحكم — أدخل الرمز</h3>
+    <h3>تسجيل دخول الأدمن</h3>
     <div class="admin-pin-error" id="adminPinError"></div>
-    <input type="password" inputmode="numeric" maxlength="6" id="adminPinInput" placeholder="••••"/>
+    <input type="email" id="adminEmailInput" placeholder="الإيميل" style="text-align:right;letter-spacing:normal;font-size:15px;margin-bottom:8px;"/>
+    <input type="password" id="adminPinInput" placeholder="الباسورد" style="text-align:right;letter-spacing:normal;font-size:15px;"/>
     <div class="admin-pin-actions">
       <button class="cancel" onclick="closeAdminLogin()">إلغاء</button>
       <button class="confirm" onclick="checkAdminPin()">دخول</button>
@@ -1834,8 +1861,7 @@ img { -webkit-user-drag: none; }
   </div>
   <div class="admin-body" id="adminBody"></div>
   <div class="admin-footer">
-    <button class="admin-btn reset" onclick="adminResetDefaults()">↺ استعادة الافتراضي</button>
-    <button class="admin-btn save" onclick="adminSaveChanges()">💾 حفظ التغييرات</button>
+    <button class="admin-btn reset" onclick="handleAdminLogout()">🚪 خروج</button>
   </div>
 </div>
 <div class="admin-toast" id="adminToast"></div>
@@ -1851,7 +1877,7 @@ img { -webkit-user-drag: none; }
 
   <div class="menu-view active" id="view-home">
     <div class="kiosk-top-bar">
-      <span class="kiosk-brand">🥐 أنوار لبنان للمخبوزات والحلويات</span>
+      <span class="kiosk-brand" id="logoTapTarget">🥐 أنوار لبنان للمخبوزات والحلويات</span>
       <span class="kiosk-clock" id="kioskClock"></span>
     </div>
 
@@ -1897,499 +1923,10 @@ img { -webkit-user-drag: none; }
 </div>
 
 
-<script>
-/* ══════════════════════════════════════
-   KIOSK CLOCK
-══════════════════════════════════════ */
-function updateKioskClock() {
-  const el = document.getElementById('kioskClock');
-  if (!el) return;
-  const now = new Date();
-  const uae = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Dubai' }));
-  el.textContent = uae.toLocaleTimeString('ar-AE', { hour: '2-digit', minute: '2-digit' });
-}
-updateKioskClock();
-setInterval(updateKioskClock, 15000);
+<div class="conn-status-dot" id="connStatusDot" title="حالة الاتصال"></div>
 
-/* ── Smart image loader: adds img-loaded class + handles errors ── */
-const CAT_FALLBACK = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='260' viewBox='0 0 400 260'%3E%3Crect width='400' height='260' fill='%23EAD9C5'/%3E%3Ccircle cx='200' cy='110' r='40' fill='%23D4A830' opacity='0.3'/%3E%3Ctext x='200' y='165' text-anchor='middle' font-family='sans-serif' font-size='13' fill='%23B07040'%3Eلا توجد صورة%3C/text%3E%3C/svg%3E";
-function setupImageLoading(img, fallback) {
-  const done = () => img.classList.add('img-loaded');
-  const fail = () => { if (img.src !== fallback) img.src = fallback; img.classList.add('img-loaded'); };
-  if (img.complete && img.naturalWidth > 0) done();
-  else if (img.complete) fail();
-  else { img.addEventListener('load', done, { once: true }); img.addEventListener('error', fail, { once: true }); }
-}
-/* ── Scroll-more indicator ── */
-let scrollTicking = false;
-const scrollMoreIndicatorEl = document.getElementById('scrollMoreIndicator');
-const viewHomeEl = document.getElementById('view-home');
-function checkScrollIndicator() {
-  if (!scrollMoreIndicatorEl) return;
-  const atBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 24);
-  const homeActive = viewHomeEl.classList.contains('active');
-  scrollMoreIndicatorEl.classList.toggle('show', homeActive && !atBottom);
-}
-window.addEventListener('scroll', () => {
-  if (!scrollTicking) {
-    scrollTicking = true;
-    requestAnimationFrame(() => { checkScrollIndicator(); scrollTicking = false; });
-  }
-}, { passive: true });
-window.addEventListener('resize', checkScrollIndicator, { passive: true });
-setTimeout(checkScrollIndicator, 600);
-
-/* ══════════════════════════════════════
-   MENU DATA
-══════════════════════════════════════ */
-const DEFAULT_HOME_CARDS = [
-  {id:'cakeTemplates', type:'category', img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/file_000000000740820a8d2409ab443818d0.png', label:'قوالب الكيك'},
-  {id:'oriental',      type:'category', img:'https://i.ibb.co/SDRmyqb2/f74c473db15d9fd47e73b3c2b036a0bf.jpg', label:'الحلويات الشرقية'},
-  {id:'western',       type:'category', img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779780950169.jpg', label:'الحلويات الغربية'},
-  {id:'pastry',        type:'category', img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/b5172deb3ad4c5f14079df067bb62d6c.jpg', label:'فطائر ومعجنات'},
-  {id:'mashaltet',     type:'image', img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260819-WA0016.jpg', label:'الفطير المشلتت',
-    menuImg:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/5_20260819_181017_٠٠٠٠.png'},
-  {id:'pizza',         type:'image', img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260819-WA0015.jpg', label:'البيتزا',
-    menuImg:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/فلفل_20260819_182728_٠٠٠٠.png'},
-];
-
-const DEFAULT_CATEGORIES = {
-  cakeTemplates:{
-    name:'قوالب الكيك', emoji:'🎂',
-    banner:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/file_00000000d4d8820a8c4fc943f3ff7a56.png',
-    tag:'نصنع أي شكل تريده',
-    items:[
-      {name:'كيكة الفراولة',            img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0004.jpg'},
-      {name:'كيكة باربي',               img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0005.jpg'},
-      {name:'كيكة ماشا والدب',          img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0006.jpg'},
-      {name:'كيكة شوكولاتة الخرز',      img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0007.jpg'},
-      {name:'كيكة برشلونة',             img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0008.jpg'},
-      {name:'كيكة الغابة السوداء',      img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0009.jpg'},
-      {name:'كيكة الكريمة',             img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0010.jpg'},
-      {name:'كيكة الشوكولاتة',          img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0011.jpg'},
-      {name:'تشيز كيك',                 img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0012.jpg'},
-      {name:'كيكة الشوكولاتة والتوت',   img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0013.jpg'},
-      {name:'كيكة الكرز الملكي',        img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0014.jpg'},
-      {name:'كيكة شوكولاتة بالكريمة',   img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0015.jpg'},
-      {name:'كيكة كراميل فانيليا',      img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0016.jpg'},
-      {name:'كيكة موس الشوكولاتة',      img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0017.jpg'},
-      {name:'كيكة فادج ميرور',          img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0018.jpg'},
-      {name:'كيكة قلب الشوكولاتة',      img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/IMG-20260827-WA0019.jpg'},
-    ]
-  },
-  oriental:{
-    name:'الحلويات الشرقية', emoji:'🍯',
-    banner:'https://i.ibb.co/SDRmyqb2/f74c473db15d9fd47e73b3c2b036a0bf.jpg',
-    tag:'حلويات أصيلة من قلب الشام',
-    items:[
-      {name:'بقلاوة تركية',        img:'https://i.ibb.co/ycjqyhpQ/FB-IMG-1779778686523.jpg'},
-      {name:'بوكس بقلاوة مشكل',    img:'https://i.ibb.co/kVkdPrpY/FB-IMG-1779778739654.jpg', sizes:['0.5 كيلو','1 كيلو']},
-      {name:'معمول',               img:'https://i.ibb.co/S7VDScQx/FB-IMG-1779778781318.jpg', flavors:['فستق حلبي','جوز','تمر']},
-      {name:'برازق',               img:'https://i.ibb.co/Jwg4K95K/FB-IMG-1779778831723.jpg'},
-      {name:'غريبة',               img:'https://i.ibb.co/MkdhRTsx/FB-IMG-1779778858559.jpg'},
-      {name:'صحن بلح شام',         img:'https://i.ibb.co/2YL5Sk0r/FB-IMG-1779778879008.jpg'},
-      {name:'كنافة',               img:'https://i.ibb.co/twkWsCZv/8f851a88ead5b6b5eac507ab0bac1ede.jpg'},
-      {name:'أصابع زينب',          img:'https://i.ibb.co/bRWWKKgz/f438f73c30813df3993466f02d0f915d-1.jpg'},
-      {name:'مشبك سوري',           img:'https://i.ibb.co/zTrbbX7G/323ec12440da9cdb19a39d14a603e946.jpg'},
-      {name:'صحن عش البلبل', price:21, img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779778904036.jpg'},
-      {name:'صحن هريسة',     price:17, img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779778895475.jpg'},
-      {name:'بقلاوة',              img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779778928897.jpg'},
-    ]
-  },
-  western:{
-    name:'الحلويات الغربية', emoji:'🎂',
-    banner:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779780950169.jpg',
-    tag:'حلويات غربية فاخرة',
-    items:[
-      {name:'قطعة الكيك',    img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/Screenshot_20260526_102946_Facebook.jpg'},
-      {name:'إسبانية',       img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779778941151.jpg'},
-      {name:'كاسات الكريمة', img:'https://i.ibb.co/TVbs7xL/FB-IMG-1779781055642.jpg', flavors:['بيستاشيو','كاسترد','لوتس','نوتيلا']},
-      {name:'كاسات الجيلي',  img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779781314818.jpg'},
-    ]
-  },
-  pastry:{
-    name:'فطائر ومعجنات', emoji:'🥐',
-    banner:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/b5172deb3ad4c5f14079df067bb62d6c.jpg',
-    tag:'طازجة يومياً من الفرن',
-    items:[
-      {name:'مناقيش', img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779782200762.jpg', wide:true,
-        manaeshTypes:['جبن','زعتر','جبن حلوم','جبن زيتون','لبنة زعتر','جبن سبايسي','لبنة فلافل','لبنة فيتا','سبانخ','بطاطا','مكس أجبان']},
-      {name:'محمرة',         img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779782453293.jpg'},
-      {name:'دواري',         img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779782457748.jpg'},
-      {name:'فطائر',         img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779782472122.jpg'},
-      {name:'فطير مشلتت',    img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779783656876.jpg'},
-      {name:'خبز لبناني',    img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779782460575.jpg'},
-      {name:'صمون عادي',     img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779782476341.jpg'},
-      {name:'صمون بالحليب',  img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779782468075.jpg'},
-      {name:'توست ناشف',     img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779782470243.jpg'},
-      {name:'سلايس',         img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779782478386.jpg'},
-      {name:'كعك',           img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779782481692.jpg'},
-      {name:'صحن فطائر مشكل', img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779782411715.jpg'},
-      {name:'خلية النحل',     img:'https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/FB_IMG_1779782442367.jpg'},
-    ]
-  }
-};
-
-/* ── Persisted state (localStorage overrides the defaults above) ── */
-const STORAGE_KEY = 'anwarKioskMenuData_v1';
-const ADMIN_PIN = '1234';
-
-function cloneDefaults(){
-  return {
-    homeCards: JSON.parse(JSON.stringify(DEFAULT_HOME_CARDS)),
-    categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES))
-  };
-}
-let state;
-try {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  state = saved ? JSON.parse(saved) : cloneDefaults();
-  if (!state || !state.homeCards || !state.categories) state = cloneDefaults();
-} catch(e) { state = cloneDefaults(); }
-
-function persistState(){
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); return true; }
-  catch(e){ return false; }
-}
-
-function countLabel(card){
-  if (card.type === 'image') return '📋 اضغط لعرض المنيو';
-  const cat = state.categories[card.id];
-  const n = cat && cat.items ? cat.items.length : 0;
-  return n + ' صنف';
-}
-
-function renderHomeGrid(){
-  const grid = document.getElementById('homeGrid');
-  if (!grid) return;
-  grid.innerHTML = state.homeCards.map(card => {
-    const onclick = card.type === 'image'
-      ? `openImageMenu('${(card.menuImg||'').replace(/'/g,"\\'")}','${(card.label||'').replace(/'/g,"\\'")}')`
-      : `openCategory('${card.id}')`;
-    return `
-      <div class="cat-card" onclick="${onclick}">
-        <div class="cat-img-wrap">
-          <img class="cat-img" src="${card.img}" alt="${card.label}" loading="lazy" decoding="async"/>
-          <div class="cat-img-overlay"></div>
-        </div>
-        <div class="cat-body">
-          <div class="cat-name">${card.label}</div>
-          <div class="cat-meta"><div class="cat-arrow">←</div><div class="cat-count">${countLabel(card)}</div></div>
-        </div>
-      </div>`;
-  }).join('');
-  grid.querySelectorAll('.cat-img').forEach(img => setupImageLoading(img, CAT_FALLBACK));
-}
-renderHomeGrid();
-
-const fallbackImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23F5EDE3'/%3E%3Ccircle cx='200' cy='120' r='45' fill='%23EAD9C5'/%3E%3Cpath d='M178 108 Q200 85 222 108 Q240 130 222 148 Q200 165 178 148 Q160 130 178 108Z' fill='%23D4A830' opacity='0.4'/%3E%3Cpath d='M190 118 L200 108 L210 118 L206 132 L194 132Z' fill='%23B8830A' opacity='0.5'/%3E%3Ctext x='200' y='195' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%23B07040'%3Eالصورة غير متاحة%3C/text%3E%3C/svg%3E";
-
-function buildPriceHTML(item){
-  if(item.price !== undefined)
-    return `<div class="prod-price"><span class="prod-currency">AED </span>${item.price}</div>`;
-  return `<div class="prod-price dash">—</div>`;
-}
-function buildBadgeHTML(item){
-  if(item.price !== undefined)
-    return `<div class="prod-badge">${item.price} AED</div>`;
-  return `<div class="prod-badge no-price">—</div>`;
-}
-
-const productsGrid = document.getElementById('products-grid');
-productsGrid.addEventListener('error', function(e){
-  const img = e.target;
-  if (img.tagName === 'IMG' && img.classList.contains('prod-img')) {
-    if (img.src !== fallbackImg) img.src = fallbackImg;
-    img.classList.add('img-loaded');
-  }
-}, true);
-productsGrid.addEventListener('load', function(e){
-  const img = e.target;
-  if (img.tagName === 'IMG' && img.classList.contains('prod-img')) {
-    img.classList.add('img-loaded');
-  }
-}, true);
-
-function openCategory(key){
-  const cat = state.categories[key];
-  if (!cat) return;
-  document.getElementById('inner-emoji').textContent = cat.emoji;
-  document.getElementById('inner-title').textContent = cat.name;
-  const bannerImg = document.getElementById('inner-banner');
-  bannerImg.classList.remove('img-loaded');
-  bannerImg.src = cat.banner;
-  setupImageLoading(bannerImg, fallbackImg);
-  document.getElementById('inner-tag').textContent = cat.tag;
-
-  const grid = productsGrid;
-  grid.innerHTML = '';
-  const frag = document.createDocumentFragment();
-  cat.items.forEach((item)=>{
-    const card = document.createElement('div');
-    card.className = 'prod-card'+(item.wide?' wide':'')+(item.tall?' tall':'');
-    let extras = '';
-    if(item.sizes)
-      extras += `<div class="prod-sizes">${item.sizes.map(s=>`<span class="prod-size-chip">${s}</span>`).join('')}</div>`;
-    if(item.flavors)
-      extras += `<div class="prod-flavors">${item.flavors.map(f=>`<span class="prod-flavor-chip">${f}</span>`).join('')}</div>`;
-    if(item.note)
-      extras += `<div class="prod-note">${item.note}</div>`;
-    let manaesh = '';
-    if(item.manaeshTypes)
-      manaesh = `<div class="manaesh-types">${item.manaeshTypes.map(t=>`<span class="manaesh-chip">${t}</span>`).join('')}</div>`;
-    card.innerHTML=`
-      <div class="prod-img-wrap">
-        <img class="prod-img" src="${item.img}" alt="${item.name}" loading="lazy" decoding="async"/>
-        ${buildBadgeHTML(item)}
-      </div>
-      <div class="prod-body">
-        <div>
-          <div class="prod-name">${item.name}</div>
-          ${extras}${manaesh}
-        </div>
-        <div class="prod-price-row">
-          ${buildPriceHTML(item)}
-          <div class="prod-heart">🤍</div>
-        </div>
-      </div>`;
-    frag.appendChild(card);
-  });
-  grid.appendChild(frag);
-
-  const cards = grid.querySelectorAll('.prod-card');
-  cards.forEach((c, i) => {
-    c.style.transitionDelay = (Math.min(i, 10) * 50) + 'ms';
-  });
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      cards.forEach(c => c.classList.add('show'));
-    });
-  });
-
-  document.getElementById('view-home').classList.remove('active');
-  document.getElementById('view-inner').classList.add('active');
-  window.scrollTo(0, 0);
-}
-
-function goHome(){
-  document.getElementById('view-inner').classList.remove('active');
-  document.getElementById('view-image').classList.remove('active');
-  document.getElementById('view-home').classList.add('active');
-  window.scrollTo(0, 0);
-  setTimeout(checkScrollIndicator, 200);
-}
-
-function openImageMenu(imgUrl, title){
-  document.getElementById('image-title').textContent = title;
-  document.getElementById('image-menu-photo').src = imgUrl;
-  document.getElementById('view-home').classList.remove('active');
-  document.getElementById('view-inner').classList.remove('active');
-  document.getElementById('view-image').classList.add('active');
-  window.scrollTo(0, 0);
-}
-
-/* ══════════════════════════════════════
-   KIOSK MODE — start / fullscreen / idle reset
-══════════════════════════════════════ */
-function startKiosk(){
-  const overlay = document.getElementById('kioskStartOverlay');
-  overlay.classList.add('hidden');
-  const el = document.documentElement;
-  const reqFS = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-  if (reqFS) { try { reqFS.call(el); } catch(e){} }
-}
-
-const KIOSK_IDLE_MS = 60000; /* يرجع تلقائياً للصفحة الرئيسية بعد دقيقة من عدم اللمس */
-let kioskIdleTimer = null;
-function resetKioskIdleTimer(){
-  if (kioskIdleTimer) clearTimeout(kioskIdleTimer);
-  kioskIdleTimer = setTimeout(() => {
-    if (document.getElementById('adminPanel').classList.contains('show')) return; /* لا يرجع أثناء استخدام لوحة التحكم */
-    goHome();
-  }, KIOSK_IDLE_MS);
-}
-['click','touchstart','pointerdown','scroll'].forEach(evt => {
-  window.addEventListener(evt, resetKioskIdleTimer, { passive: true });
-});
-resetKioskIdleTimer();
-
-/* ══════════════════════════════════════
-   ADMIN PANEL
-══════════════════════════════════════ */
-let adminEditingCategoryKey = null; /* null = عرض قائمة الأقسام الرئيسية */
-
-function showAdminToast(msg){
-  const t = document.getElementById('adminToast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-function openAdminLogin(){
-  document.getElementById('adminPinInput').value = '';
-  document.getElementById('adminPinError').textContent = '';
-  document.getElementById('adminPinBackdrop').classList.add('show');
-  setTimeout(() => document.getElementById('adminPinInput').focus(), 50);
-}
-function closeAdminLogin(){
-  document.getElementById('adminPinBackdrop').classList.remove('show');
-}
-function checkAdminPin(){
-  const val = document.getElementById('adminPinInput').value;
-  if (val === ADMIN_PIN) {
-    closeAdminLogin();
-    openAdminPanel();
-  } else {
-    document.getElementById('adminPinError').textContent = 'رمز غير صحيح، حاول مرة أخرى';
-  }
-}
-document.getElementById('adminPinInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') checkAdminPin();
-});
-
-function openAdminPanel(){
-  adminEditingCategoryKey = null;
-  renderAdminBody();
-  document.getElementById('adminPanel').classList.add('show');
-}
-function closeAdminPanel(){
-  document.getElementById('adminPanel').classList.remove('show');
-}
-
-function renderAdminBody(){
-  const body = document.getElementById('adminBody');
-  if (adminEditingCategoryKey) {
-    body.innerHTML = renderAdminItemsEditor(adminEditingCategoryKey);
-  } else {
-    body.innerHTML = renderAdminHomeCardsEditor();
-  }
-}
-
-function renderAdminHomeCardsEditor(){
-  let html = '<div class="admin-section-title">الأقسام الرئيسية (الترتيب كما يظهر في الصفحة)</div>';
-  html += state.homeCards.map((card, i) => `
-    <div class="admin-card-row">
-      <img src="${card.img}" alt=""/>
-      <div class="admin-field-col">
-        <input class="admin-name" value="${escAttr(card.label)}" oninput="adminUpdateHomeCard(${i},'label',this.value)" placeholder="اسم القسم"/>
-        <input value="${escAttr(card.img)}" oninput="adminUpdateHomeCard(${i},'img',this.value)" placeholder="رابط صورة الكارت"/>
-        ${card.type === 'image' ? `<input value="${escAttr(card.menuImg||'')}" oninput="adminUpdateHomeCard(${i},'menuImg',this.value)" placeholder="رابط صورة المنيو الكاملة"/>` : ''}
-      </div>
-      <div class="admin-row-actions">
-        ${card.type === 'category' ? `<button class="admin-btn edit" onclick="adminOpenCategoryEditor('${card.id}')">تعديل الأصناف</button>` : ''}
-      </div>
-    </div>
-  `).join('');
-  return html;
-}
-
-function adminOpenCategoryEditor(key){
-  adminEditingCategoryKey = key;
-  renderAdminBody();
-}
-
-function renderAdminItemsEditor(key){
-  const cat = state.categories[key];
-  if (!cat) { adminEditingCategoryKey = null; return renderAdminHomeCardsEditor(); }
-  let html = `<button class="admin-btn back-to-cats" onclick="adminBackToCards()">→ رجوع للأقسام الرئيسية</button>`;
-  html += `<div class="admin-section-title">بيانات القسم: ${escAttr(cat.name)}</div>`;
-  html += `
-    <div class="admin-card-row">
-      <img src="${cat.banner}" alt=""/>
-      <div class="admin-field-col">
-        <input class="admin-name" value="${escAttr(cat.name)}" oninput="adminUpdateCategoryField('${key}','name',this.value)" placeholder="اسم القسم"/>
-        <input value="${escAttr(cat.banner)}" oninput="adminUpdateCategoryField('${key}','banner',this.value)" placeholder="رابط صورة البانر"/>
-        <input value="${escAttr(cat.tag||'')}" oninput="adminUpdateCategoryField('${key}','tag',this.value)" placeholder="وصف قصير للقسم"/>
-      </div>
-    </div>`;
-  html += `<div class="admin-section-title">الأصناف (${cat.items.length})</div>`;
-  html += cat.items.map((item, i) => `
-    <div class="admin-card-row">
-      <img src="${item.img}" alt=""/>
-      <div class="admin-field-col">
-        <input class="admin-name" value="${escAttr(item.name)}" oninput="adminUpdateItem('${key}',${i},'name',this.value)" placeholder="اسم الصنف"/>
-        <input value="${escAttr(item.img)}" oninput="adminUpdateItem('${key}',${i},'img',this.value)" placeholder="رابط الصورة"/>
-        <input type="number" value="${item.price !== undefined ? item.price : ''}" oninput="adminUpdateItemPrice('${key}',${i},this.value)" placeholder="السعر (اتركه فارغاً لعدم عرض سعر)"/>
-      </div>
-      <div class="admin-row-actions">
-        <button class="admin-btn del" onclick="adminDeleteItem('${key}',${i})">حذف 🗑</button>
-      </div>
-    </div>
-  `).join('');
-  html += `<button class="admin-btn add" onclick="adminAddItem('${key}')">+ إضافة صنف جديد</button>`;
-  return html;
-}
-
-function adminBackToCards(){
-  adminEditingCategoryKey = null;
-  renderAdminBody();
-}
-
-function escAttr(s){
-  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-}
-
-function adminUpdateHomeCard(i, field, value){
-  state.homeCards[i][field] = value;
-  if (field === 'img') {
-    const img = document.querySelectorAll('#adminBody .admin-card-row img')[i];
-    if (img) img.src = value;
-  }
-}
-function adminUpdateCategoryField(key, field, value){
-  state.categories[key][field] = value;
-  if (field === 'banner') {
-    const img = document.querySelector('#adminBody .admin-card-row img');
-    if (img) img.src = value;
-  }
-}
-function adminUpdateItem(key, i, field, value){
-  state.categories[key].items[i][field] = value;
-  if (field === 'img') {
-    const rows = document.querySelectorAll('#adminBody .admin-card-row img');
-    if (rows[i+1]) rows[i+1].src = value; /* +1 لأن أول صف هو بانر القسم */
-  }
-}
-function adminUpdateItemPrice(key, i, value){
-  const item = state.categories[key].items[i];
-  if (value === '') delete item.price;
-  else item.price = Number(value);
-}
-function adminDeleteItem(key, i){
-  if (!confirm('تأكيد حذف هذا الصنف؟')) return;
-  state.categories[key].items.splice(i, 1);
-  renderAdminBody();
-}
-function adminAddItem(key){
-  state.categories[key].items.push({ name: 'صنف جديد', img: fallbackImg });
-  renderAdminBody();
-}
-
-function adminSaveChanges(){
-  if (persistState()) {
-    renderHomeGrid();
-    if (document.getElementById('view-inner').classList.contains('active')) {
-      /* أعد رسم صفحة القسم المفتوحة حالياً إن وُجدت */
-      const openTitle = document.getElementById('inner-title').textContent;
-      const match = Object.keys(state.categories).find(k => state.categories[k].name === openTitle);
-      if (match) openCategory(match);
-    }
-    showAdminToast('✅ تم حفظ التغييرات');
-  } else {
-    showAdminToast('⚠️ تعذر الحفظ على هذا الجهاز');
-  }
-}
-
-function adminResetDefaults(){
-  if (!confirm('سيتم حذف كل التعديلات والعودة للوضع الافتراضي. متأكد؟')) return;
-  state = cloneDefaults();
-  persistState();
-  adminEditingCategoryKey = null;
-  renderAdminBody();
-  renderHomeGrid();
-  showAdminToast('↺ تمت الاستعادة للوضع الافتراضي');
-}
-</script>
+<script type="module" src="./firebase-app.js"></script>
+<script type="module" src="./kiosk-app.js"></script>
 
 </body>
 </html>
