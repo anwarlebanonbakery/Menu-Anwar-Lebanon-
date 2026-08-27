@@ -36,7 +36,7 @@ let scrollTicking = false;
 const scrollMoreIndicatorEl = document.getElementById('scrollMoreIndicator');
 const viewHomeEl = document.getElementById('view-home');
 function checkScrollIndicator() {
-  if (!scrollMoreIndicatorEl) return;
+  if (!scrollMoreIndicatorEl || !viewHomeEl) return;
   const atBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 24);
   const homeActive = viewHomeEl.classList.contains('active');
   scrollMoreIndicatorEl.classList.toggle('show', homeActive && !atBottom);
@@ -92,7 +92,8 @@ function buildBadgeHTML(item) {
 
 let currentCategoryId = null;
 
-function openCategory(catId) {
+function openCategory(catId, opts = {}) {
+  const { silent = false } = opts; // silent = تحديث المحتوى بس، من غير تغيير الشاشة أو تصفير السكرول (بيُستخدم مع الـ polling)
   const cat = liveState.categories.find(c => c.id === catId);
   if (!cat) return;
   currentCategoryId = catId;
@@ -139,12 +140,19 @@ function openCategory(catId) {
   grid.querySelectorAll('.prod-img').forEach(img => setupImageLoading(img, fallbackImg));
 
   const cards = grid.querySelectorAll('.prod-card');
-  cards.forEach((c, i) => { c.style.transitionDelay = (Math.min(i, 10) * 50) + 'ms'; });
-  requestAnimationFrame(() => requestAnimationFrame(() => cards.forEach(c => c.classList.add('show'))));
+  if (silent) {
+    // تحديث في الخلفية بس (بولينج) — من غير تأخير أو أنيميشن يلفت النظر وسط قراءة العميل
+    cards.forEach(c => c.classList.add('show'));
+  } else {
+    cards.forEach((c, i) => { c.style.transitionDelay = (Math.min(i, 10) * 50) + 'ms'; });
+    requestAnimationFrame(() => requestAnimationFrame(() => cards.forEach(c => c.classList.add('show'))));
+  }
 
-  document.getElementById('view-home').classList.remove('active');
-  document.getElementById('view-inner').classList.add('active');
-  window.scrollTo(0, 0);
+  if (!silent) {
+    document.getElementById('view-home').classList.remove('active');
+    document.getElementById('view-inner').classList.add('active');
+    window.scrollTo(0, 0);
+  }
 }
 window.openCategory = openCategory;
 
@@ -170,9 +178,9 @@ window.openImageMenu = openImageMenu;
 /* ── إعادة رسم كل حاجة بعد كل تحديث بيانات ── */
 function renderAll() {
   renderHomeGrid();
-  // لو المستخدم واقف جوه قسم مفتوح، حدّثه كمان بنفس اللحظة
+  // لو المستخدم واقف جوه قسم مفتوح، حدّثه كمان بنفس اللحظة (silent = من غير ما نصفّر السكرول أو نعيد الأنيميشن)
   if (currentCategoryId && document.getElementById('view-inner').classList.contains('active')) {
-    openCategory(currentCategoryId);
+    openCategory(currentCategoryId, { silent: true });
   }
   if (liveState.isAdmin && document.getElementById('adminPanel').classList.contains('show')) {
     renderAdminBody();
@@ -217,15 +225,21 @@ resetKioskIdleTimer();
 ══════════════════════════════════════ */
 let logoTapCount = 0;
 let logoTapTimer = null;
-document.getElementById('logoTapTarget').addEventListener('click', () => {
-  logoTapCount++;
-  if (logoTapTimer) clearTimeout(logoTapTimer);
-  logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 1500);
-  if (logoTapCount >= 3) {
-    logoTapCount = 0;
-    openAdminLogin();
-  }
-});
+const logoTapEl = document.getElementById('logoTapTarget');
+if (logoTapEl) {
+  logoTapEl.addEventListener('click', () => {
+    logoTapCount++;
+    if (logoTapTimer) clearTimeout(logoTapTimer);
+    logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 1500);
+    if (logoTapCount >= 3) {
+      logoTapCount = 0;
+      openAdminLogin();
+    }
+  });
+} else {
+  // لو الـ id ده مش موجود في الـ HTML (مثلاً وقت لصق التعديلات)، سيبها تكمل من غير ما توقف باقي السكريبت
+  console.warn('logoTapTarget مش موجود — الدخول بـ 3 لمسات مش هيشتغل، تأكد إن الـ id اتحط صح في الـ HTML (خطوة 5)');
+}
 
 function showAdminToast(msg) {
   const t = document.getElementById('adminToast');
