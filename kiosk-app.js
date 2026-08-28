@@ -1,13 +1,10 @@
 /* ══════════════════════════════════════
-   kiosk-app.js — منطق عرض المنيو + لوحة الأدمن
+   kiosk-app.js — منطق عرض المنيو (للعرض فقط)
+   الأدمن بقى في صفحة منفصلة: admin.html
    بيقرا من firebase-app.js (liveState) بدل localStorage
 ══════════════════════════════════════ */
 import {
   liveState, setCallbacks, fetchMenuData, startPolling,
-  adminLogin, adminLogout, resetAdminIdleTimer,
-  uploadMenuImage,
-  createCategory, updateCategory, deleteCategory,
-  createProduct, updateProduct, deleteProduct,
 } from "./firebase-app.js";
 
 /* ── الساعة ── */
@@ -264,9 +261,6 @@ function renderAll() {
   if (currentCategoryId && document.getElementById('view-inner').classList.contains('active')) {
     openCategory(currentCategoryId);
   }
-  if (liveState.isAdmin && document.getElementById('adminPanel').classList.contains('show')) {
-    renderAdminBody();
-  }
 }
 
 /* ── مؤشر الاتصال ── */
@@ -293,17 +287,18 @@ let kioskIdleTimer = null;
 function resetKioskIdleTimer() {
   if (kioskIdleTimer) clearTimeout(kioskIdleTimer);
   kioskIdleTimer = setTimeout(() => {
-    if (document.getElementById('adminPanel').classList.contains('show')) return;
+    const overlay = document.getElementById('adminOverlay');
+    if (overlay && overlay.classList.contains('show')) return;
     goHome();
   }, KIOSK_IDLE_MS);
 }
 ['click', 'touchstart', 'pointerdown', 'scroll'].forEach(evt => {
-  window.addEventListener(evt, () => { resetKioskIdleTimer(); resetAdminIdleTimer(); }, { passive: true });
+  window.addEventListener(evt, () => { resetKioskIdleTimer(); }, { passive: true });
 });
 resetKioskIdleTimer();
 
 /* ══════════════════════════════════════
-   دخول الأدمن — 3 لمسات على اللوجو
+   دخول الأدمن — 3 لمسات على اللوجو تفتح لوحة التحكم المنفصلة
 ══════════════════════════════════════ */
 let logoTapCount = 0;
 let logoTapTimer = null;
@@ -313,275 +308,9 @@ document.getElementById('logoTapTarget').addEventListener('click', () => {
   logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 1500);
   if (logoTapCount >= 3) {
     logoTapCount = 0;
-    openAdminLogin();
+    if (window.openAdminOverlay) window.openAdminOverlay();
   }
 });
-
-function showAdminToast(msg) {
-  const t = document.getElementById('adminToast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-function openAdminLogin() {
-  document.getElementById('adminEmailInput').value = '';
-  document.getElementById('adminPinInput').value = '';
-  document.getElementById('adminPinError').textContent = '';
-  document.getElementById('adminPinBackdrop').classList.add('show');
-}
-window.closeAdminLogin = function () {
-  document.getElementById('adminPinBackdrop').classList.remove('show');
-};
-
-window.checkAdminPin = async function () {
-  const email = document.getElementById('adminEmailInput').value.trim();
-  const password = document.getElementById('adminPinInput').value;
-  const errEl = document.getElementById('adminPinError');
-  if (!email || !password) { errEl.textContent = 'حط الإيميل والباسورد'; return; }
-  try {
-    await adminLogin(email, password);
-    window.closeAdminLogin();
-    openAdminPanel();
-  } catch (e) {
-    errEl.textContent = 'بيانات دخول غلط';
-  }
-};
-
-window.handleAdminLogout = async function () {
-  await adminLogout();
-  closeAdminPanel();
-  showAdminToast('تم الخروج');
-};
-
-/* ══════════════════════════════════════
-   لوحة الأدمن — CRUD كامل عبر Firestore + Cloudinary
-══════════════════════════════════════ */
-let adminEditingCategoryId = null;
-
-function openAdminPanel() {
-  adminEditingCategoryId = null;
-  renderAdminBody();
-  document.getElementById('adminPanel').classList.add('show');
-  resetAdminIdleTimer();
-}
-function closeAdminPanel() {
-  document.getElementById('adminPanel').classList.remove('show');
-}
-window.closeAdminPanel = closeAdminPanel;
-
-function escAttr(s) {
-  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-}
-
-let adminSearchTerm = '';
-
-function filterAdminRows(value) {
-  adminSearchTerm = value;
-  const q = value.trim().toLowerCase();
-  document.querySelectorAll('#adminBody .admin-card-row[data-search]').forEach(row => {
-    row.style.display = row.dataset.search.includes(q) ? '' : 'none';
-  });
-}
-window.filterAdminRows = filterAdminRows;
-
-function adminSearchBar(placeholder) {
-  return `
-    <div class="admin-search-wrap">
-      <input type="text" value="${escAttr(adminSearchTerm)}" placeholder="${placeholder}" oninput="window.filterAdminRows(this.value)"/>
-      <span class="admin-search-icon">🔍</span>
-    </div>`;
-}
-
-function toggleField(id, checked, onchange, label) {
-  return `
-    <div class="admin-toggle-row">
-      <span>${label}</span>
-      <label class="admin-toggle">
-        <input type="checkbox" ${checked ? 'checked' : ''} onchange="${onchange}"/>
-        <span class="track"></span>
-      </label>
-    </div>`;
-}
-
-function renderAdminBody() {
-  const body = document.getElementById('adminBody');
-  adminSearchTerm = '';
-  body.innerHTML = adminEditingCategoryId ? renderAdminItemsEditor(adminEditingCategoryId) : renderAdminCategoriesEditor();
-  wireAdminFileInputs();
-}
-
-function renderAdminCategoriesEditor() {
-  const totalProducts = Object.values(liveState.products).reduce((sum, arr) => sum + arr.length, 0);
-  const hiddenCats = liveState.categories.filter(c => !c.visible).length;
-
-  let html = `
-    <div class="admin-stats-row">
-      <div class="admin-stat-card"><div class="admin-stat-num">${liveState.categories.length}</div><div class="admin-stat-label">أقسام</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-num">${totalProducts}</div><div class="admin-stat-label">أصناف</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-num">${hiddenCats}</div><div class="admin-stat-label">أقسام مخفية</div></div>
-    </div>`;
-  html += adminSearchBar('دور على قسم...');
-  html += '<div class="admin-section-title">الأقسام الرئيسية</div>';
-
-  if (!liveState.categories.length) {
-    html += `<div class="admin-empty-state">مفيش أقسام لسه — ابدأي بإضافة أول قسم 👇</div>`;
-  }
-
-  html += liveState.categories.map(cat => `
-    <div class="admin-card-row" data-search="${escAttr((cat.name || '').toLowerCase())}">
-      <img src="${cat.imageUrl}" alt=""/>
-      <div class="admin-field-col">
-        <input class="admin-name" value="${escAttr(cat.name)}" onchange="window.__adminUpdateCat('${cat.id}',{name:this.value})" placeholder="اسم القسم"/>
-        <label class="admin-btn edit" style="text-align:center;display:block;">📷 غيّر الصورة
-          <input type="file" accept="image/*" style="display:none" data-cat-img="${cat.id}"/>
-        </label>
-        ${toggleField(cat.id, cat.visible, `window.__adminUpdateCat('${cat.id}',{visible:this.checked})`, 'ظاهر في المنيو')}
-      </div>
-      <div class="admin-row-actions">
-        ${cat.displayType !== 'image' ? `<button class="admin-btn edit" onclick="window.__adminOpenCategory('${cat.id}')">الأصناف ›</button>` : ''}
-        <button class="admin-btn del" onclick="window.__adminDeleteCategory('${cat.id}')">حذف 🗑</button>
-      </div>
-    </div>
-  `).join('');
-  html += `<button class="admin-btn add" onclick="window.__adminAddCategory()">+ إضافة قسم جديد</button>`;
-  return html;
-}
-
-function renderAdminItemsEditor(catId) {
-  const cat = liveState.categories.find(c => c.id === catId);
-  if (!cat) { adminEditingCategoryId = null; return renderAdminCategoriesEditor(); }
-  const items = liveState.products[catId] || [];
-  const hiddenItems = items.filter(i => !i.visible).length;
-  const withPrice = items.filter(i => i.price != null).length;
-
-  let html = `<button class="admin-btn back-to-cats" onclick="window.__adminBackToCats()">→ رجوع للأقسام</button>`;
-  html += `
-    <div class="admin-stats-row">
-      <div class="admin-stat-card"><div class="admin-stat-num">${items.length}</div><div class="admin-stat-label">أصناف</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-num">${withPrice}</div><div class="admin-stat-label">بسعر</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-num">${hiddenItems}</div><div class="admin-stat-label">مخفية</div></div>
-    </div>`;
-  html += adminSearchBar('دور على صنف...');
-  html += `<div class="admin-section-title">أصناف: ${escAttr(cat.name)}</div>`;
-
-  if (!items.length) {
-    html += `<div class="admin-empty-state">القسم ده لسه فاضي — ضيفي أول صنف 👇</div>`;
-  }
-
-  html += items.map(item => `
-    <div class="admin-card-row" data-search="${escAttr((item.name || '').toLowerCase())}">
-      <img src="${item.imageUrl}" alt=""/>
-      <div class="admin-field-col">
-        <input class="admin-name" value="${escAttr(item.name)}" onchange="window.__adminUpdateProduct('${item.id}',{name:this.value})" placeholder="اسم الصنف"/>
-        <input type="number" value="${item.price !== undefined && item.price !== null ? item.price : ''}" onchange="window.__adminUpdateProductPrice('${item.id}',this.value)" placeholder="السعر AED (فاضي = بدون سعر)"/>
-        <input type="text" value="${escAttr(item.description || '')}" onchange="window.__adminUpdateProduct('${item.id}',{description:this.value})" placeholder="الوصف"/>
-        <input type="number" min="0" max="5" step="0.1" value="${item.rating != null ? item.rating : ''}" onchange="window.__adminUpdateProduct('${item.id}',{rating:this.value===''?null:Number(this.value)})" placeholder="التقييم (0-5)"/>
-        <div class="admin-nutri-row">
-          <input type="number" value="${item.nutrition?.calories != null ? item.nutrition.calories : ''}" onchange="window.__adminUpdateNutrition('${item.id}','calories',this.value)" placeholder="سعرات"/>
-          <input type="number" value="${item.nutrition?.protein != null ? item.nutrition.protein : ''}" onchange="window.__adminUpdateNutrition('${item.id}','protein',this.value)" placeholder="بروتين"/>
-          <input type="number" value="${item.nutrition?.fat != null ? item.nutrition.fat : ''}" onchange="window.__adminUpdateNutrition('${item.id}','fat',this.value)" placeholder="دهون"/>
-          <input type="number" value="${item.nutrition?.carb != null ? item.nutrition.carb : ''}" onchange="window.__adminUpdateNutrition('${item.id}','carb',this.value)" placeholder="كارب"/>
-        </div>
-        <label class="admin-btn edit" style="text-align:center;display:block;">📷 غيّر الصورة
-          <input type="file" accept="image/*" style="display:none" data-prod-img="${item.id}"/>
-        </label>
-        ${toggleField(item.id, item.visible, `window.__adminUpdateProduct('${item.id}',{visible:this.checked})`, 'ظاهر في المنيو')}
-      </div>
-      <div class="admin-row-actions">
-        <button class="admin-btn del" onclick="window.__adminDeleteProduct('${item.id}')">حذف 🗑</button>
-      </div>
-    </div>
-  `).join('');
-  html += `<button class="admin-btn add" onclick="window.__adminAddProduct('${catId}')">+ إضافة صنف جديد</button>`;
-  return html;
-}
-
-function wireAdminFileInputs() {
-  document.querySelectorAll('[data-cat-img]').forEach(inp => {
-    inp.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      showAdminToast('⏳ جاري رفع الصورة...');
-      try {
-        const { url } = await uploadMenuImage(file);
-        await updateCategory(inp.dataset.catImg, { imageUrl: url });
-        await fetchMenuData();
-        showAdminToast('✅ اتحدثت الصورة');
-      } catch (err) { showAdminToast('⚠️ فشل رفع الصورة'); }
-    });
-  });
-  document.querySelectorAll('[data-prod-img]').forEach(inp => {
-    inp.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      showAdminToast('⏳ جاري رفع الصورة...');
-      try {
-        const { url } = await uploadMenuImage(file);
-        await updateProduct(inp.dataset.prodImg, { imageUrl: url });
-        await fetchMenuData();
-        showAdminToast('✅ اتحدثت الصورة');
-      } catch (err) { showAdminToast('⚠️ فشل رفع الصورة'); }
-    });
-  });
-}
-
-window.__adminOpenCategory = (id) => { adminEditingCategoryId = id; renderAdminBody(); };
-window.__adminBackToCats = () => { adminEditingCategoryId = null; renderAdminBody(); };
-
-window.__adminUpdateCat = async (id, data) => {
-  await updateCategory(id, data);
-  await fetchMenuData();
-  showAdminToast('✅ اتحفظ');
-};
-window.__adminDeleteCategory = async (id) => {
-  if (!confirm('تأكيد حذف القسم ده وكل أصنافه؟')) return;
-  const items = liveState.products[id] || [];
-  for (const it of items) await deleteProduct(it.id);
-  await deleteCategory(id);
-  await fetchMenuData();
-  renderAdminBody();
-  showAdminToast('🗑 اتحذف');
-};
-window.__adminAddCategory = async () => {
-  const maxOrder = liveState.categories.reduce((m, c) => Math.max(m, c.displayOrder || 0), -1);
-  await createCategory({ name: 'قسم جديد', imageUrl: fallbackImg, displayType: 'category', menuImageUrl: '', displayOrder: maxOrder + 1, visible: true });
-  await fetchMenuData();
-  renderAdminBody();
-};
-
-window.__adminUpdateProduct = async (id, data) => {
-  await updateProduct(id, data);
-  await fetchMenuData();
-  showAdminToast('✅ اتحفظ');
-};
-window.__adminUpdateProductPrice = async (id, value) => {
-  await updateProduct(id, { price: value === '' ? null : Number(value) });
-  await fetchMenuData();
-  showAdminToast('✅ اتحفظ');
-};
-window.__adminUpdateNutrition = async (id, field, value) => {
-  const item = findProductById(id);
-  const nutrition = { calories: null, protein: null, fat: null, carb: null, ...(item && item.nutrition ? item.nutrition : {}) };
-  nutrition[field] = value === '' ? null : Number(value);
-  await updateProduct(id, { nutrition });
-  await fetchMenuData();
-  showAdminToast('✅ اتحفظ');
-};
-window.__adminDeleteProduct = async (id) => {
-  if (!confirm('تأكيد حذف الصنف؟')) return;
-  await deleteProduct(id);
-  await fetchMenuData();
-  renderAdminBody();
-  showAdminToast('🗑 اتحذف');
-};
-window.__adminAddProduct = async (catId) => {
-  const items = liveState.products[catId] || [];
-  const maxOrder = items.reduce((m, p) => Math.max(m, p.displayOrder || 0), -1);
-  await createProduct({ name: 'صنف جديد', categoryId: catId, imageUrl: fallbackImg, price: null, description: '', rating: null, nutrition: { calories: null, protein: null, fat: null, carb: null }, flavors: [], sizes: [], manaeshTypes: [], wide: false, tall: false, displayOrder: maxOrder + 1, visible: true });
-  await fetchMenuData();
-  renderAdminBody();
-};
 
 /* ══════════════════════════════════════
    البداية
