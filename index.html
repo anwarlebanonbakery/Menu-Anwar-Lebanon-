@@ -452,132 +452,6 @@ img { -webkit-user-drag: none; }
 #kioskStartOverlay.hidden { display: none; }
 
 /* ── Admin access gear ── */
-#adminGearBtn {
-  position: fixed; bottom: 10px; right: 10px; z-index: 300;
-  width: 30px; height: 30px; border-radius: 50%;
-  background: rgba(0,0,0,0.08); color: rgba(0,0,0,0.35);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; border: none; cursor: pointer;
-}
-
-/* ── Admin PIN modal ── */
-.admin-modal-backdrop {
-  position: fixed; inset: 0; z-index: 950; background: rgba(20,10,5,0.55);
-  display: none; align-items: center; justify-content: center; padding: 20px;
-}
-.admin-modal-backdrop.show { display: flex; }
-.admin-pin-box {
-  background: #fff; border-radius: 18px; padding: 26px 22px; width: 100%; max-width: 300px;
-  text-align: center; font-family:'Tajawal',sans-serif;
-}
-.admin-pin-box h3 { font-size: 16px; font-weight: 800; margin-bottom: 14px; color: var(--m-brown-d,#3A1A05); }
-.admin-pin-box input {
-  width: 100%; text-align: center; font-size: 22px; letter-spacing: 8px; padding: 10px;
-  border: 2px solid #E0D3C2; border-radius: 12px; margin-bottom: 12px; font-family:'Tajawal',sans-serif;
-}
-.admin-pin-box .admin-pin-actions { display: flex; gap: 8px; }
-.admin-pin-box button.confirm { flex: 1; background: var(--orange,#B8830A); color: #fff; border: none; border-radius: 12px; padding: 10px; font-weight: 800; cursor: pointer; }
-.admin-pin-box button.cancel { flex: 1; background: #F0EAE2; color: #6b5842; border: none; border-radius: 12px; padding: 10px; font-weight: 800; cursor: pointer; }
-.admin-pin-error { color: #C0392B; font-size: 12px; margin-bottom: 8px; min-height: 16px; }
-
-/* ── Admin panel — dashboard redesign ── */
-.admin-panel {
-  position: fixed; inset: 0; z-index: 940; background: #F3F1EC;
-  display: none; flex-direction: column; font-family:'Tajawal',sans-serif;
-}
-.admin-panel.show { display: flex; }
-.admin-header {
-  background: var(--green-deep-grad); color: #fff; padding: 16px 18px;
-  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-}
-.admin-header h2 { font-size: 16px; font-weight: 800; }
-.admin-header .admin-header-sub { font-size: 11px; color: rgba(255,255,255,0.65); font-weight: 600; margin-top: 2px; }
-.admin-close-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; flex-shrink: 0; }
-
-.admin-body { flex: 1; overflow-y: auto; padding: 16px; }
-
-/* stat pills */
-.admin-stats-row { display: flex; gap: 8px; margin-bottom: 16px; }
-.admin-stat-card {
-  flex: 1; background: #fff; border-radius: 14px; padding: 12px 10px; text-align: center;
-  border: 1px solid #E9E2D4; box-shadow: 0 2px 8px rgba(58,26,5,0.04);
-}
-.admin-stat-num { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 19px; color: var(--m-brown-d,#3A1A05); }
-.admin-stat-label { font-size: 10.5px; color: #8a7a63; font-weight: 700; margin-top: 2px; }
-
-/* search */
-.admin-search-wrap { position: relative; margin-bottom: 14px; }
-.admin-search-wrap input {
-  width: 100%; padding: 11px 38px 11px 14px; border-radius: 30px; border: 1px solid #E0D3C2;
-  font-family: 'Tajawal', sans-serif; font-size: 13.5px; background: #fff;
-}
-.admin-search-wrap .admin-search-icon {
-  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-  color: #b2a084; font-size: 14px; pointer-events: none;
-}
-
-.admin-section-title {
-  font-size: 12.5px; font-weight: 800; color: #8a7a63; letter-spacing: 0.4px;
-  margin: 18px 2px 10px; text-transform: uppercase;
-}
-
-.admin-card-row {
-  display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 16px;
-  padding: 12px; margin-bottom: 10px; border: 1px solid #EEE0CD;
-  box-shadow: 0 2px 10px rgba(58,26,5,0.04); transition: box-shadow .15s;
-}
-.admin-card-row:hover { box-shadow: 0 6px 18px rgba(58,26,5,0.08); }
-.admin-card-row img { width: 54px; height: 54px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #EEE; }
-.admin-field-col { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.admin-field-col input {
-  width: 100%; font-size: 13px; padding: 8px 10px; border: 1px solid #E7DCC9; border-radius: 9px;
-  font-family:'Tajawal',sans-serif; background: #FBF8F2;
-}
-.admin-field-col input.admin-name { font-weight: 800; font-size: 14px; background: #fff; }
-.admin-nutri-row { display: flex; gap: 6px; }
-.admin-nutri-row input { text-align: center; }
-
-.admin-toggle-row {
-  display: flex; align-items: center; justify-content: space-between;
-  font-size: 12px; font-weight: 700; color: #6b5842; margin-top: 2px;
-}
-.admin-toggle { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
-.admin-toggle input { opacity: 0; width: 0; height: 0; }
-.admin-toggle .track {
-  position: absolute; inset: 0; background: #E0D3C2; border-radius: 20px; cursor: pointer; transition: background .2s;
-}
-.admin-toggle .track::before {
-  content: ''; position: absolute; width: 16px; height: 16px; left: 2px; top: 2px;
-  background: #fff; border-radius: 50%; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-.admin-toggle input:checked + .track { background: var(--green,#1F7A4D); }
-.admin-toggle input:checked + .track::before { transform: translateX(-16px); }
-
-.admin-row-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; align-self: stretch; justify-content: center; }
-.admin-btn {
-  border: none; border-radius: 10px; padding: 8px 12px; font-size: 12px; font-weight: 800; cursor: pointer;
-  font-family:'Tajawal',sans-serif; white-space: nowrap; transition: opacity .15s;
-}
-.admin-btn:active { opacity: 0.75; }
-.admin-btn.edit { background: #F0E9DA; color: #7A5A28; }
-.admin-btn.del { background: #FBE5E1; color: #C0392B; }
-.admin-btn.add {
-  position: sticky; bottom: 8px; background: var(--orange,#E63946); color: #fff; width: 100%;
-  padding: 13px; font-size: 14px; margin-top: 8px; border-radius: 30px;
-  box-shadow: 0 8px 20px rgba(230,57,70,0.3);
-}
-.admin-btn.back-to-cats { background: #F0E9DA; color: #7A5A28; margin-bottom: 14px; }
-.admin-empty-state { text-align: center; padding: 40px 20px; color: #a8987c; font-size: 13px; }
-.admin-footer { flex-shrink: 0; padding: 12px 16px; background: #fff; border-top: 1px solid #EEE0CD; display: flex; gap: 10px; }
-.admin-footer .admin-btn.save { flex: 2; background: var(--green-deep-grad,#1E4B3E); color: #fff; padding: 13px; font-size: 14px; }
-.admin-footer .admin-btn.reset { flex: 1; background: #F0EAE2; color: #6b5842; padding: 13px; font-size: 13px; }
-.admin-toast {
-  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-  background: var(--green-deep-grad,#1E4B3E); color: #fff; padding: 10px 20px; border-radius: 30px;
-  font-family:'Tajawal',sans-serif; font-size: 13px; font-weight: 700; z-index: 960;
-  opacity: 0; transition: opacity .3s; pointer-events: none;
-}
-.admin-toast.show { opacity: 1; }
 
 .menu-hero {
   position: relative;
@@ -1997,7 +1871,7 @@ img { -webkit-user-drag: none; }
 
   .home-grid {
     max-width: 1180px;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 24px;
     padding: 34px 44px 60px;
   }
@@ -2010,23 +1884,210 @@ img { -webkit-user-drag: none; }
 
   .products-grid {
     max-width: 1180px;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 22px;
     padding: 34px 44px 70px;
   }
   .prod-card.tall { grid-column: auto; }
-
-  /* لوحة الأدمن على الديسك توب — كارت في النص، مش شاشة كاملة ممطوطة */
-  .admin-panel {
-    top: 4vh; bottom: 4vh; left: 50%; right: auto;
-    transform: translateX(-50%);
-    width: 480px; max-width: 92vw;
-    border-radius: 22px; overflow: hidden;
-    box-shadow: 0 40px 110px rgba(0,0,0,0.45);
-  }
-
-  /* اوفرلاي البداية ولوحة الأدمن-PIN تفضل شاشة كاملة (مقصودة أصلاً) */
 }
+
+/* شاشات ديسك توب واسعة فعلاً (مش تابلت) — توزيعة ديناميكية حسب المساحة */
+@media (min-width: 1280px) {
+  .home-grid {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  }
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+/* ══════════════════════════════════════
+   لوحة التحكم — overlay كامل جوه نفس الصفحة
+══════════════════════════════════════ */
+#adminOverlay{
+  --ink:#0D1210; --ink-2:#141B18; --sidebar:#101613;
+  --gold:#C9A227; --gold-l:#E4C55A;
+  --green:#1F7A4D; --green-d:#145C36; --green-pale:#E8F5EC;
+  --red:#D9432E; --red-pale:#FBE7E3;
+  --bg:#F4F3EF; --card:#FFFFFF; --line:#E6E2D8;
+  --text:#161311; --text-mid:#6E675A; --text-dim:#A69C88;
+}
+#adminOverlay *{margin:0;padding:0;box-sizing:border-box;}
+#adminOverlay{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);}
+#adminOverlay h1, #adminOverlay h2, #adminOverlay h3, #adminOverlay .brand, #adminOverlay .stat-num, #adminOverlay .nav-item, #adminOverlay .btn, #adminOverlay th{font-family:'Cairo',sans-serif;}
+#adminOverlay button{font:inherit;cursor:pointer;border:none;background:none;}
+#adminOverlay input, #adminOverlay select, #adminOverlay textarea{font-family:'Tajawal',sans-serif;}
+#adminOverlay /* ── desktop-only gate ── */
+
+/* ── login screen ── */
+#loginScreen{
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(circle at 30% 20%, #1C2620 0%, var(--ink) 60%);
+}
+#adminOverlay .login-card{
+  width:380px; background:var(--card); border-radius:22px; padding:38px 34px;
+  box-shadow:0 30px 80px rgba(0,0,0,0.35); text-align:center;
+}
+#adminOverlay .login-card .brand-mark{
+  width:56px; height:56px; border-radius:16px; margin:0 auto 16px;
+  background:linear-gradient(135deg,var(--green),var(--green-d));
+  display:flex; align-items:center; justify-content:center; font-size:26px;
+}
+#adminOverlay .login-card h1{font-size:19px; font-weight:800;}
+#adminOverlay .login-card .sub{font-size:12.5px; color:var(--text-mid); margin-top:4px; margin-bottom:24px;}
+#adminOverlay .login-card input{
+  width:100%; padding:13px 14px; margin-bottom:10px; border:1.5px solid var(--line);
+  border-radius:12px; font-size:14px; text-align:right; background:#FBFAF7;
+}
+#adminOverlay .login-card input:focus{outline:none; border-color:var(--gold);}
+#adminOverlay .login-btn{
+  width:100%; padding:14px; border-radius:12px; margin-top:8px;
+  background:linear-gradient(135deg,var(--green),var(--green-d)); color:#fff;
+  font-weight:800; font-size:14.5px; box-shadow:0 10px 24px rgba(31,122,77,0.3);
+}
+#adminOverlay .login-err{color:var(--red); font-size:12.5px; min-height:18px; margin-top:10px;}
+#adminOverlay /* ── app shell ── */
+#appRoot{display:none; min-height:100vh;}
+#adminOverlay #appRoot.show{display:flex;}
+#adminOverlay .sidebar{
+  width:250px; flex-shrink:0; background:var(--sidebar); color:#fff;
+  display:flex; flex-direction:column; padding:22px 16px;
+}
+#adminOverlay .sidebar .brand{display:flex; align-items:center; gap:10px; padding:0 6px 26px;}
+#adminOverlay .sidebar .brand .mark{
+  width:38px; height:38px; border-radius:11px; flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold),#8C6E14);
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+#adminOverlay .sidebar .brand .txt{font-weight:800; font-size:15px; line-height:1.3;}
+#adminOverlay .sidebar .brand .txt small{display:block; font-size:10.5px; font-weight:500; color:rgba(255,255,255,0.45);}
+#adminOverlay .nav-item{
+  display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px;
+  color:rgba(255,255,255,0.62); font-size:13.5px; font-weight:700; margin-bottom:4px;
+  transition:background .15s,color .15s; width:100%; text-align:right;
+}
+#adminOverlay .nav-item .ic{font-size:16px; width:20px; text-align:center;}
+#adminOverlay .nav-item:hover{background:rgba(255,255,255,0.05); color:#fff;}
+#adminOverlay .nav-item.active{background:rgba(201,162,39,0.14); color:var(--gold-l);}
+#adminOverlay .sidebar-foot{margin-top:auto; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08);}
+#adminOverlay .admin-mail{font-size:11px; color:rgba(255,255,255,0.4); padding:0 6px 10px; word-break:break-all;}
+#adminOverlay .logout-btn{
+  display:flex; align-items:center; gap:10px; width:100%; padding:11px 14px;
+  border-radius:12px; color:rgba(255,255,255,0.6); font-size:13px; font-weight:700;
+}
+#adminOverlay .logout-btn:hover{background:rgba(217,67,46,0.14); color:#FF8A75;}
+#adminOverlay .main{flex:1; min-width:0; display:flex; flex-direction:column; height:100vh; overflow:hidden;}
+#adminOverlay .topbar{
+  flex-shrink:0; padding:22px 34px; display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--line); background:var(--card);
+}
+#adminOverlay .topbar h1{font-size:19px; font-weight:800;}
+#adminOverlay .topbar .sub{font-size:12px; color:var(--text-mid); margin-top:2px; font-weight:500;}
+#adminOverlay .search-box{position:relative; width:280px;}
+#adminOverlay .search-box input{
+  width:100%; padding:11px 38px 11px 14px; border-radius:30px; border:1.5px solid var(--line);
+  font-size:13px; background:#FBFAF7;
+}
+#adminOverlay .search-box input:focus{outline:none; border-color:var(--gold);}
+#adminOverlay .search-box .ic{position:absolute; right:14px; top:50%; transform:translateY(-50%); color:var(--text-dim); font-size:13px;}
+#adminOverlay .content{flex:1; overflow-y:auto; padding:28px 34px 50px;}
+#adminOverlay .stats-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:26px;}
+#adminOverlay .stat-card{
+  background:var(--card); border:1px solid var(--line); border-radius:18px; padding:20px;
+  display:flex; align-items:center; gap:14px;
+}
+#adminOverlay .stat-card .ic{
+  width:44px; height:44px; border-radius:13px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:19px;
+}
+#adminOverlay .stat-card.c1 .ic{background:var(--green-pale); color:var(--green-d);}
+#adminOverlay .stat-card.c2 .ic{background:#FFF3D9; color:#9C7A0B;}
+#adminOverlay .stat-card.c3 .ic{background:var(--red-pale); color:var(--red);}
+#adminOverlay .stat-card.c4 .ic{background:#E9F1FB; color:#2E6DA4;}
+#adminOverlay .stat-num{font-size:22px; font-weight:900;}
+#adminOverlay .stat-label{font-size:11.5px; color:var(--text-mid); font-weight:600; margin-top:1px;}
+#adminOverlay .panel{background:var(--card); border:1px solid var(--line); border-radius:18px; overflow:hidden; margin-bottom:22px;}
+#adminOverlay .panel-head{padding:18px 22px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line);}
+#adminOverlay .panel-head h3{font-size:15px; font-weight:800;}
+#adminOverlay .panel-head .cnt{font-size:12px; color:var(--text-mid); font-weight:600;}
+#adminOverlay .btn{padding:10px 18px; border-radius:11px; font-size:13px; font-weight:800; display:inline-flex; align-items:center; gap:7px;}
+#adminOverlay .btn.gold{background:linear-gradient(135deg,var(--gold),#9C7A0B); color:#fff; box-shadow:0 8px 18px rgba(201,162,39,0.3);}
+#adminOverlay .btn.ghost{background:#F1EFE8; color:var(--text-mid);}
+#adminOverlay .btn.danger{background:var(--red-pale); color:var(--red);}
+#adminOverlay .btn.sm{padding:7px 12px; font-size:12px; border-radius:9px;}
+#adminOverlay table{width:100%; border-collapse:collapse;}
+#adminOverlay th{text-align:right; font-size:11px; color:var(--text-dim); font-weight:700; padding:10px 22px; border-bottom:1px solid var(--line); background:#FBFAF7;}
+#adminOverlay td{padding:12px 22px; border-bottom:1px solid var(--line); font-size:13.5px; vertical-align:middle;}
+#adminOverlay tr:last-child td{border-bottom:none;}
+#adminOverlay tr.row:hover{background:#FBFAF7;}
+#adminOverlay .cell-thumb{width:44px; height:44px; border-radius:10px; object-fit:cover; background:#EEE;}
+#adminOverlay .cell-name{display:flex; align-items:center; gap:12px;}
+#adminOverlay .cell-name .n{font-weight:800;}
+#adminOverlay .cell-name .s{font-size:11px; color:var(--text-dim); margin-top:1px;}
+#adminOverlay .price-tag{color:var(--green-d); font-weight:800;}
+#adminOverlay .price-tag.na{color:var(--text-dim); font-weight:600;}
+#adminOverlay .badge{display:inline-flex; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:800;}
+#adminOverlay .badge.on{background:var(--green-pale); color:var(--green-d);}
+#adminOverlay .badge.off{background:#F1EFE8; color:var(--text-dim);}
+#adminOverlay .row-actions{display:flex; gap:6px; justify-content:flex-end;}
+#adminOverlay .icon-btn{width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:13px; background:#F1EFE8; color:var(--text-mid);}
+#adminOverlay .icon-btn.del:hover{background:var(--red-pale); color:var(--red);}
+#adminOverlay .icon-btn:hover{background:#E9E5D9;}
+#adminOverlay .empty-row td{text-align:center; padding:44px 20px; color:var(--text-dim); font-size:13px;}
+#adminOverlay .cat-filter-row{display:flex; gap:8px; padding:16px 22px 0; flex-wrap:wrap;}
+#adminOverlay .chip-filter{padding:7px 15px; border-radius:20px; font-size:12.5px; font-weight:700; background:#F1EFE8; color:var(--text-mid);}
+#adminOverlay .chip-filter.active{background:var(--ink); color:#fff;}
+#adminOverlay /* ── slide-over drawer ── */
+.drawer-backdrop{position:fixed; inset:0; background:rgba(13,18,16,0.45); z-index:500; display:none;}
+#adminOverlay .drawer-backdrop.show{display:block;}
+#adminOverlay .drawer{
+  position:fixed; top:0; bottom:0; left:0; width:420px; max-width:92vw; background:var(--card);
+  z-index:501; box-shadow:10px 0 40px rgba(0,0,0,0.2);
+  transform:translateX(-100%); transition:transform .25s ease; display:flex; flex-direction:column;
+}
+#adminOverlay .drawer-backdrop.show .drawer{transform:translateX(0);}
+#adminOverlay .drawer-head{padding:20px 24px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;}
+#adminOverlay .drawer-head h3{font-size:16px; font-weight:800;}
+#adminOverlay .drawer-body{flex:1; overflow-y:auto; padding:22px 24px;}
+#adminOverlay .field{margin-bottom:16px;}
+#adminOverlay .field label{display:block; font-size:12px; font-weight:800; color:var(--text-mid); margin-bottom:6px;}
+#adminOverlay .field input, #adminOverlay .field textarea{
+  width:100%; padding:11px 13px; border:1.5px solid var(--line); border-radius:10px; font-size:13.5px; background:#FBFAF7;
+}
+#adminOverlay .field input:focus, #adminOverlay .field textarea:focus{outline:none; border-color:var(--gold);}
+#adminOverlay .field-row{display:flex; gap:10px;}
+#adminOverlay .field-row .field{flex:1;}
+#adminOverlay .field-hint{font-size:11px; color:var(--text-dim); margin-top:4px;}
+#adminOverlay .img-upload{
+  display:flex; align-items:center; gap:12px; padding:10px; border:1.5px dashed var(--line); border-radius:12px;
+}
+#adminOverlay .img-upload img{width:52px; height:52px; border-radius:10px; object-fit:cover; background:#EEE; flex-shrink:0;}
+#adminOverlay .img-upload label{
+  flex:1; text-align:center; padding:9px; border-radius:9px; background:#F1EFE8; font-size:12.5px; font-weight:700; color:var(--text-mid);
+}
+#adminOverlay .toggle-field{display:flex; align-items:center; justify-content:space-between; padding:2px 0;}
+#adminOverlay .toggle{position:relative; display:inline-block; width:38px; height:21px;}
+#adminOverlay .toggle input{opacity:0; width:0; height:0;}
+#adminOverlay .toggle .track{position:absolute; inset:0; background:var(--line); border-radius:20px; transition:background .2s;}
+#adminOverlay .toggle .track::before{content:''; position:absolute; width:17px; height:17px; left:2px; top:2px; background:#fff; border-radius:50%; transition:transform .2s; box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+#adminOverlay .toggle input:checked + .track{background:var(--green);}
+#adminOverlay .toggle input:checked + .track::before{transform:translateX(-17px);}
+#adminOverlay .drawer-foot{padding:16px 24px; border-top:1px solid var(--line); display:flex; gap:10px;}
+#adminOverlay .drawer-foot .btn{flex:1; justify-content:center;}
+#adminOverlay .toast{
+  position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px); z-index:700;
+  background:var(--ink); color:#fff; padding:12px 22px; border-radius:30px; font-size:13px; font-weight:700;
+  opacity:0; transition:opacity .25s, transform .25s; pointer-events:none;
+}
+#adminOverlay .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+#adminOverlay {
+  display: none; position: fixed; inset: 0; z-index: 900; overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#adminOverlay.show { display: block; }
+#adminOverlay #appRoot, #adminOverlay #loginScreen { min-width: 1180px; }
+#adminOverlay #appRoot.show { display: flex; }
 
 </style>
 </head>
@@ -2037,31 +2098,6 @@ img { -webkit-user-drag: none; }
   <div class="kiosk-start-title">أنوار لبنان<br>مخبز وحلويات</div>
   <button class="kiosk-start-btn" onclick="startKiosk()">بدء العرض</button>
 </div>
-
-<div class="admin-modal-backdrop" id="adminPinBackdrop">
-  <div class="admin-pin-box">
-    <h3>تسجيل دخول الأدمن</h3>
-    <div class="admin-pin-error" id="adminPinError"></div>
-    <input type="email" id="adminEmailInput" placeholder="الإيميل" style="text-align:right;letter-spacing:normal;font-size:15px;margin-bottom:8px;"/>
-    <input type="password" id="adminPinInput" placeholder="الباسورد" style="text-align:right;letter-spacing:normal;font-size:15px;"/>
-    <div class="admin-pin-actions">
-      <button class="cancel" onclick="closeAdminLogin()">إلغاء</button>
-      <button class="confirm" onclick="checkAdminPin()">دخول</button>
-    </div>
-  </div>
-</div>
-
-<div class="admin-panel" id="adminPanel">
-  <div class="admin-header">
-    <h2>لوحة تحكم المنيو</h2>
-    <button class="admin-close-btn" onclick="closeAdminPanel()">✕</button>
-  </div>
-  <div class="admin-body" id="adminBody"></div>
-  <div class="admin-footer">
-    <button class="admin-btn reset" onclick="handleAdminLogout()">🚪 خروج</button>
-  </div>
-</div>
-<div class="admin-toast" id="adminToast"></div>
 
 <!-- ══════════════════════════════════════
      MAIN PAGE
@@ -2154,10 +2190,461 @@ img { -webkit-user-drag: none; }
 </div>
 
 
+<div id="adminOverlay">
+  <button id="adminOverlayClose" style="position:fixed;top:14px;left:14px;z-index:600;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.9);box-shadow:0 4px 14px rgba(0,0,0,0.25);font-size:15px;display:flex;align-items:center;justify-content:center;">✕</button>
+
+
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="brand-mark">🥐</div>
+    <h1>لوحة تحكم أنوار لبنان</h1>
+    <div class="sub">سجلي دخول بحساب الأدمن</div>
+    <input id="loginEmail" type="email" placeholder="الإيميل"/>
+    <input id="loginPassword" type="password" placeholder="الباسورد"/>
+    <div class="login-err" id="loginErr"></div>
+    <button class="login-btn" id="loginBtn">دخول</button>
+  </div>
+</div>
+
+<div id="appRoot">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">🥐</div>
+      <div class="txt">أنوار لبنان<small>لوحة التحكم</small></div>
+    </div>
+    <button class="nav-item active" data-view="overview"><span class="ic">📊</span> نظرة عامة</button>
+    <button class="nav-item" data-view="categories"><span class="ic">🗂️</span> الأقسام</button>
+    <button class="nav-item" data-view="products"><span class="ic">🧁</span> الأصناف</button>
+    <div class="sidebar-foot">
+      <div class="admin-mail" id="adminMailLabel"></div>
+      <button class="logout-btn" id="logoutBtn"><span class="ic">🚪</span> تسجيل خروج</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="pageTitle">نظرة عامة</h1>
+        <div class="sub" id="pageSub">ملخص سريع على حالة المنيو</div>
+      </div>
+      <div class="search-box" id="topSearchWrap" style="display:none;">
+        <input id="topSearchInput" type="text" placeholder="دور على صنف أو قسم..."/>
+        <span class="ic">🔍</span>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div class="drawer-backdrop" id="drawerBackdrop">
+  <div class="drawer">
+    <div class="drawer-head">
+      <h3 id="drawerTitle">تعديل</h3>
+      <button class="icon-btn" id="drawerClose">✕</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+    <div class="drawer-foot">
+      <button class="btn ghost" id="drawerCancel">إلغاء</button>
+      <button class="btn gold" id="drawerSave">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+</div>
+
 <div class="conn-status-dot" id="connStatusDot" title="حالة الاتصال"></div>
 
 <script type="module" src="./firebase-app.js"></script>
 <script type="module" src="./kiosk-app.js"></script>
+<script type="module">
+import {
+  liveState, fetchMenuData, adminLogin, adminLogout,
+  uploadMenuImage, createCategory, updateCategory, deleteCategory,
+  createProduct, updateProduct, deleteProduct,
+} from "./firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+/* ── فتح/قفل أوفرلاي الأدمن — بيفرض عرض ديسك توب حتى على الموبايل ── */
+const KIOSK_VIEWPORT = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+const ADMIN_VIEWPORT = "width=1180, initial-scale=0.32, user-scalable=yes";
+function fitAdminViewport() {
+  const scale = Math.min(1, (window.innerWidth || 1180) / 1180);
+  document.querySelector('meta[name="viewport"]').setAttribute('content', `width=1180, initial-scale=${scale}, user-scalable=yes`);
+}
+window.openAdminOverlay = function () {
+  document.getElementById('adminOverlay').classList.add('show');
+  fitAdminViewport();
+};
+function closeAdminOverlay() {
+  document.getElementById('adminOverlay').classList.remove('show');
+  document.querySelector('meta[name="viewport"]').setAttribute('content', KIOSK_VIEWPORT);
+}
+document.getElementById('adminOverlayClose').addEventListener('click', closeAdminOverlay);
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+function showToast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function escAttr(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+}
+
+/* ── auth ── */
+$('#loginBtn').onclick = async () => {
+  const email = $('#loginEmail').value.trim();
+  const password = $('#loginPassword').value;
+  const err = $('#loginErr');
+  if (!email || !password) { err.textContent = 'حط الإيميل والباسورد'; return; }
+  try {
+    await adminLogin(email, password);
+  } catch (e) {
+    err.textContent = 'بيانات دخول غلط';
+  }
+};
+$('#logoutBtn').onclick = async () => { await adminLogout(); closeAdminOverlay(); };
+
+onAuthStateChanged(getAuth(), async (user) => {
+  if (user) {
+    $('#loginScreen').style.display = 'none';
+    $('#appRoot').classList.add('show');
+    $('#adminMailLabel').textContent = user.email || '';
+    await fetchMenuData();
+    render();
+  } else {
+    $('#appRoot').classList.remove('show');
+    $('#loginScreen').style.display = 'flex';
+  }
+});
+
+/* ── nav / view state ── */
+let currentView = 'overview';
+let searchTerm = '';
+let productCatFilter = 'all';
+
+$$('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentView = btn.dataset.view;
+    searchTerm = '';
+    productCatFilter = 'all';
+    render();
+  });
+});
+
+$('#topSearchInput').addEventListener('input', (e) => {
+  searchTerm = e.target.value.trim().toLowerCase();
+  renderContentOnly();
+});
+
+const titles = {
+  overview: ['نظرة عامة', 'ملخص سريع على حالة المنيو'],
+  categories: ['الأقسام', 'إدارة أقسام المنيو الرئيسية'],
+  products: ['الأصناف', 'كل الأصناف عبر كل الأقسام'],
+};
+
+function render() {
+  const [title, sub] = titles[currentView];
+  $('#pageTitle').textContent = title;
+  $('#pageSub').textContent = sub;
+  $('#topSearchWrap').style.display = currentView === 'overview' ? 'none' : 'block';
+  $('#topSearchInput').value = '';
+  renderContentOnly();
+}
+
+function renderContentOnly() {
+  const content = $('#content');
+  if (currentView === 'overview') content.innerHTML = renderOverview();
+  else if (currentView === 'categories') content.innerHTML = renderCategoriesTable();
+  else content.innerHTML = renderProductsTable();
+  wireContentEvents();
+}
+
+function allProductsFlat() {
+  const out = [];
+  for (const catId in liveState.products) {
+    (liveState.products[catId] || []).forEach(p => out.push({ ...p, categoryId: catId }));
+  }
+  return out;
+}
+
+function renderOverview() {
+  const cats = liveState.categories;
+  const products = allProductsFlat();
+  const hiddenCats = cats.filter(c => !c.visible).length;
+  const hiddenProds = products.filter(p => !p.visible).length;
+  const withPrice = products.filter(p => p.price != null).length;
+
+  const recentCats = [...cats].slice(-5).reverse();
+
+  return `
+    <div class="stats-grid">
+      <div class="stat-card c1"><div class="ic">🗂️</div><div><div class="stat-num">${cats.length}</div><div class="stat-label">أقسام (${hiddenCats} مخفي)</div></div></div>
+      <div class="stat-card c2"><div class="ic">🧁</div><div><div class="stat-num">${products.length}</div><div class="stat-label">أصناف (${hiddenProds} مخفي)</div></div></div>
+      <div class="stat-card c3"><div class="ic">💰</div><div><div class="stat-num">${withPrice}</div><div class="stat-label">أصناف بسعر</div></div></div>
+      <div class="stat-card c4"><div class="ic">📷</div><div><div class="stat-num">${products.length - withPrice}</div><div class="stat-label">من غير سعر</div></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>آخر الأقسام</h3><span class="cnt">${cats.length} إجمالي</span></div>
+      <table>
+        <thead><tr><th>القسم</th><th>عدد الأصناف</th><th>الحالة</th></tr></thead>
+        <tbody>
+          ${recentCats.map(c => `
+            <tr class="row">
+              <td><div class="cell-name"><img class="cell-thumb" src="${c.imageUrl}" alt=""/><div class="n">${escAttr(c.name)}</div></div></td>
+              <td>${(liveState.products[c.id] || []).length} صنف</td>
+              <td><span class="badge ${c.visible ? 'on' : 'off'}">${c.visible ? 'ظاهر' : 'مخفي'}</span></td>
+            </tr>`).join('') || `<tr class="empty-row"><td colspan="3">مفيش أقسام لسه</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function renderCategoriesTable() {
+  const q = searchTerm;
+  const cats = liveState.categories.filter(c => !q || (c.name || '').toLowerCase().includes(q));
+  return `
+    <div class="panel">
+      <div class="panel-head">
+        <h3>الأقسام الرئيسية</h3>
+        <button class="btn gold sm" id="addCatBtn">+ قسم جديد</button>
+      </div>
+      <table>
+        <thead><tr><th>القسم</th><th>النوع</th><th>عدد الأصناف</th><th>الحالة</th><th></th></tr></thead>
+        <tbody>
+          ${cats.map(c => `
+            <tr class="row">
+              <td><div class="cell-name"><img class="cell-thumb" src="${c.imageUrl}" alt=""/><div class="n">${escAttr(c.name)}</div></div></td>
+              <td>${c.displayType === 'image' ? 'صورة منيو' : 'قسم أصناف'}</td>
+              <td>${(liveState.products[c.id] || []).length} صنف</td>
+              <td><span class="badge ${c.visible ? 'on' : 'off'}">${c.visible ? 'ظاهر' : 'مخفي'}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="icon-btn edit-cat" data-id="${c.id}">✏️</button>
+                  <button class="icon-btn del del-cat" data-id="${c.id}">🗑</button>
+                </div>
+              </td>
+            </tr>`).join('') || `<tr class="empty-row"><td colspan="5">مفيش أقسام مطابقة</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function renderProductsTable() {
+  const q = searchTerm;
+  const products = allProductsFlat().filter(p =>
+    (productCatFilter === 'all' || p.categoryId === productCatFilter) &&
+    (!q || (p.name || '').toLowerCase().includes(q))
+  );
+  const chips = [`<button class="chip-filter ${productCatFilter==='all'?'active':''}" data-cat="all">الكل</button>`]
+    .concat(liveState.categories.map(c => `<button class="chip-filter ${productCatFilter===c.id?'active':''}" data-cat="${c.id}">${escAttr(c.name)}</button>`));
+
+  return `
+    <div class="panel">
+      <div class="panel-head">
+        <h3>كل الأصناف</h3>
+        <button class="btn gold sm" id="addProdBtn">+ صنف جديد</button>
+      </div>
+      <div class="cat-filter-row">${chips.join('')}</div>
+      <table style="margin-top:14px;">
+        <thead><tr><th>الصنف</th><th>السعر</th><th>التقييم</th><th>الحالة</th><th></th></tr></thead>
+        <tbody>
+          ${products.map(p => `
+            <tr class="row">
+              <td><div class="cell-name"><img class="cell-thumb" src="${p.imageUrl}" alt=""/><div><div class="n">${escAttr(p.name)}</div><div class="s">${escAttr((liveState.categories.find(c=>c.id===p.categoryId)||{}).name || '')}</div></div></div></td>
+              <td>${p.price != null ? `<span class="price-tag">${p.price} AED</span>` : `<span class="price-tag na">—</span>`}</td>
+              <td>${p.rating != null ? `⭐ ${p.rating}` : '—'}</td>
+              <td><span class="badge ${p.visible ? 'on' : 'off'}">${p.visible ? 'ظاهر' : 'مخفي'}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="icon-btn edit-prod" data-id="${p.id}">✏️</button>
+                  <button class="icon-btn del del-prod" data-id="${p.id}">🗑</button>
+                </div>
+              </td>
+            </tr>`).join('') || `<tr class="empty-row"><td colspan="5">مفيش أصناف مطابقة</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function wireContentEvents() {
+  $('#addCatBtn')?.addEventListener('click', () => openCategoryDrawer(null));
+  $$('.edit-cat').forEach(b => b.addEventListener('click', () => openCategoryDrawer(b.dataset.id)));
+  $$('.del-cat').forEach(b => b.addEventListener('click', () => handleDeleteCategory(b.dataset.id)));
+
+  $('#addProdBtn')?.addEventListener('click', () => openProductDrawer(null));
+  $$('.edit-prod').forEach(b => b.addEventListener('click', () => openProductDrawer(b.dataset.id)));
+  $$('.del-prod').forEach(b => b.addEventListener('click', () => handleDeleteProduct(b.dataset.id)));
+
+  $$('.chip-filter').forEach(b => b.addEventListener('click', () => {
+    productCatFilter = b.dataset.cat;
+    renderContentOnly();
+  }));
+}
+
+async function refreshAndRerender() {
+  await fetchMenuData();
+  renderContentOnly();
+}
+
+/* ── delete handlers ── */
+async function handleDeleteCategory(id) {
+  if (!confirm('تأكيد حذف القسم ده وكل أصنافه؟')) return;
+  const items = liveState.products[id] || [];
+  for (const it of items) await deleteProduct(it.id);
+  await deleteCategory(id);
+  showToast('🗑 اتحذف القسم');
+  await refreshAndRerender();
+}
+async function handleDeleteProduct(id) {
+  if (!confirm('تأكيد حذف الصنف؟')) return;
+  await deleteProduct(id);
+  showToast('🗑 اتحذف الصنف');
+  await refreshAndRerender();
+}
+
+/* ── drawer ── */
+const backdrop = $('#drawerBackdrop');
+$('#drawerClose').onclick = closeDrawer;
+$('#drawerCancel').onclick = closeDrawer;
+backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeDrawer(); });
+function closeDrawer() { backdrop.classList.remove('show'); }
+function openDrawer(title) { $('#drawerTitle').textContent = title; backdrop.classList.add('show'); }
+
+let pendingImageFile = null;
+
+function openCategoryDrawer(id) {
+  const cat = id ? liveState.categories.find(c => c.id === id) : null;
+  pendingImageFile = null;
+  openDrawer(cat ? 'تعديل القسم' : 'قسم جديد');
+  $('#drawerBody').innerHTML = `
+    <div class="field">
+      <label>صورة القسم</label>
+      <div class="img-upload">
+        <img id="dImgPreview" src="${cat ? cat.imageUrl : ''}" alt=""/>
+        <label>📷 اختاري صورة<input type="file" id="dImgInput" accept="image/*" style="display:none;"/></label>
+      </div>
+    </div>
+    <div class="field"><label>اسم القسم</label><input id="dName" value="${escAttr(cat?.name || '')}"/></div>
+    <div class="toggle-field field">
+      <span style="font-size:13px;font-weight:700;color:var(--text-mid);">ظاهر في المنيو</span>
+      <label class="toggle"><input type="checkbox" id="dVisible" ${cat ? (cat.visible ? 'checked':'') : 'checked'}/><span class="track"></span></label>
+    </div>`;
+  $('#dImgInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    pendingImageFile = file;
+    $('#dImgPreview').src = URL.createObjectURL(file);
+  });
+
+  $('#drawerSave').onclick = async () => {
+    const name = $('#dName').value.trim();
+    if (!name) { showToast('⚠️ حطي اسم القسم'); return; }
+    $('#drawerSave').textContent = 'جاري الحفظ...';
+    try {
+      let imageUrl = cat ? cat.imageUrl : '';
+      if (pendingImageFile) {
+        const { url } = await uploadMenuImage(pendingImageFile);
+        imageUrl = url;
+      }
+      const data = { name, imageUrl, visible: $('#dVisible').checked };
+      if (cat) await updateCategory(cat.id, data);
+      else await createCategory({ ...data, displayType: 'category', menuImageUrl: '', displayOrder: liveState.categories.length });
+      showToast('✅ اتحفظ');
+      closeDrawer();
+      await refreshAndRerender();
+    } catch (err) {
+      showToast('⚠️ حصل خطأ، حاولي تاني');
+    } finally {
+      $('#drawerSave').textContent = 'حفظ';
+    }
+  };
+}
+
+function openProductDrawer(id) {
+  const item = id ? allProductsFlat().find(p => p.id === id) : null;
+  pendingImageFile = null;
+  const catOptions = liveState.categories.map(c => `<option value="${c.id}" ${item && item.categoryId===c.id ? 'selected':''}>${escAttr(c.name)}</option>`).join('');
+  openDrawer(item ? 'تعديل الصنف' : 'صنف جديد');
+  $('#drawerBody').innerHTML = `
+    <div class="field">
+      <label>صورة الصنف</label>
+      <div class="img-upload">
+        <img id="dImgPreview" src="${item ? item.imageUrl : ''}" alt=""/>
+        <label>📷 اختاري صورة<input type="file" id="dImgInput" accept="image/*" style="display:none;"/></label>
+      </div>
+    </div>
+    <div class="field"><label>القسم</label><select id="dCat" style="width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:13.5px;background:#FBFAF7;">${catOptions}</select></div>
+    <div class="field"><label>اسم الصنف</label><input id="dName" value="${escAttr(item?.name || '')}"/></div>
+    <div class="field-row">
+      <div class="field"><label>السعر (AED)</label><input id="dPrice" type="number" value="${item?.price ?? ''}"/></div>
+      <div class="field"><label>التقييم (0-5)</label><input id="dRating" type="number" min="0" max="5" step="0.1" value="${item?.rating ?? ''}"/></div>
+    </div>
+    <div class="field"><label>الوصف</label><textarea id="dDesc" rows="3">${escAttr(item?.description || '')}</textarea></div>
+    <div class="field">
+      <label>القيمة الغذائية</label>
+      <div class="field-row">
+        <input id="dCal" type="number" placeholder="سعرات" value="${item?.nutrition?.calories ?? ''}"/>
+        <input id="dProt" type="number" placeholder="بروتين g" value="${item?.nutrition?.protein ?? ''}"/>
+        <input id="dFat" type="number" placeholder="دهون g" value="${item?.nutrition?.fat ?? ''}"/>
+        <input id="dCarb" type="number" placeholder="كارب g" value="${item?.nutrition?.carb ?? ''}"/>
+      </div>
+      <div class="field-hint">سيبيها فاضية لو مش هتظهر في صفحة الصنف</div>
+    </div>
+    <div class="toggle-field field">
+      <span style="font-size:13px;font-weight:700;color:var(--text-mid);">ظاهر في المنيو</span>
+      <label class="toggle"><input type="checkbox" id="dVisible" ${item ? (item.visible?'checked':'') : 'checked'}/><span class="track"></span></label>
+    </div>`;
+  $('#dImgInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    pendingImageFile = file;
+    $('#dImgPreview').src = URL.createObjectURL(file);
+  });
+
+  $('#drawerSave').onclick = async () => {
+    const name = $('#dName').value.trim();
+    const categoryId = $('#dCat').value;
+    if (!name) { showToast('⚠️ حطي اسم الصنف'); return; }
+    if (!categoryId) { showToast('⚠️ اختاري قسم'); return; }
+    $('#drawerSave').textContent = 'جاري الحفظ...';
+    try {
+      let imageUrl = item ? item.imageUrl : '';
+      if (pendingImageFile) {
+        const { url } = await uploadMenuImage(pendingImageFile);
+        imageUrl = url;
+      }
+      const num = (v) => v === '' ? null : Number(v);
+      const data = {
+        name, categoryId, imageUrl,
+        price: num($('#dPrice').value),
+        rating: num($('#dRating').value),
+        description: $('#dDesc').value.trim(),
+        nutrition: { calories: num($('#dCal').value), protein: num($('#dProt').value), fat: num($('#dFat').value), carb: num($('#dCarb').value) },
+        visible: $('#dVisible').checked,
+      };
+      if (item) await updateProduct(item.id, data);
+      else await createProduct({ ...data, sizes: [], flavors: [], manaeshTypes: [], wide: false, tall: false, displayOrder: (liveState.products[categoryId]||[]).length });
+      showToast('✅ اتحفظ');
+      closeDrawer();
+      await refreshAndRerender();
+    } catch (err) {
+      showToast('⚠️ حصل خطأ، حاولي تاني');
+    } finally {
+      $('#drawerSave').textContent = 'حفظ';
+    }
+  };
+}
+</script>
 
 </body>
 </html>
