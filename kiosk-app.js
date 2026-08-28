@@ -374,28 +374,72 @@ function escAttr(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 }
 
+let adminSearchTerm = '';
+
+function filterAdminRows(value) {
+  adminSearchTerm = value;
+  const q = value.trim().toLowerCase();
+  document.querySelectorAll('#adminBody .admin-card-row[data-search]').forEach(row => {
+    row.style.display = row.dataset.search.includes(q) ? '' : 'none';
+  });
+}
+window.filterAdminRows = filterAdminRows;
+
+function adminSearchBar(placeholder) {
+  return `
+    <div class="admin-search-wrap">
+      <input type="text" value="${escAttr(adminSearchTerm)}" placeholder="${placeholder}" oninput="window.filterAdminRows(this.value)"/>
+      <span class="admin-search-icon">🔍</span>
+    </div>`;
+}
+
+function toggleField(id, checked, onchange, label) {
+  return `
+    <div class="admin-toggle-row">
+      <span>${label}</span>
+      <label class="admin-toggle">
+        <input type="checkbox" ${checked ? 'checked' : ''} onchange="${onchange}"/>
+        <span class="track"></span>
+      </label>
+    </div>`;
+}
+
 function renderAdminBody() {
   const body = document.getElementById('adminBody');
+  adminSearchTerm = '';
   body.innerHTML = adminEditingCategoryId ? renderAdminItemsEditor(adminEditingCategoryId) : renderAdminCategoriesEditor();
   wireAdminFileInputs();
 }
 
 function renderAdminCategoriesEditor() {
-  let html = '<div class="admin-section-title">الأقسام الرئيسية</div>';
+  const totalProducts = Object.values(liveState.products).reduce((sum, arr) => sum + arr.length, 0);
+  const hiddenCats = liveState.categories.filter(c => !c.visible).length;
+
+  let html = `
+    <div class="admin-stats-row">
+      <div class="admin-stat-card"><div class="admin-stat-num">${liveState.categories.length}</div><div class="admin-stat-label">أقسام</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-num">${totalProducts}</div><div class="admin-stat-label">أصناف</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-num">${hiddenCats}</div><div class="admin-stat-label">أقسام مخفية</div></div>
+    </div>`;
+  html += adminSearchBar('دور على قسم...');
+  html += '<div class="admin-section-title">الأقسام الرئيسية</div>';
+
+  if (!liveState.categories.length) {
+    html += `<div class="admin-empty-state">مفيش أقسام لسه — ابدأي بإضافة أول قسم 👇</div>`;
+  }
+
   html += liveState.categories.map(cat => `
-    <div class="admin-card-row">
+    <div class="admin-card-row" data-search="${escAttr((cat.name || '').toLowerCase())}">
       <img src="${cat.imageUrl}" alt=""/>
       <div class="admin-field-col">
         <input class="admin-name" value="${escAttr(cat.name)}" onchange="window.__adminUpdateCat('${cat.id}',{name:this.value})" placeholder="اسم القسم"/>
         <label class="admin-btn edit" style="text-align:center;display:block;">📷 غيّر الصورة
           <input type="file" accept="image/*" style="display:none" data-cat-img="${cat.id}"/>
         </label>
-        <label style="font-size:12px;display:flex;align-items:center;gap:6px;">
-          <input type="checkbox" ${cat.visible ? 'checked' : ''} onchange="window.__adminUpdateCat('${cat.id}',{visible:this.checked})"/> ظاهر في المنيو
-        </label>
+        ${toggleField(cat.id, cat.visible, `window.__adminUpdateCat('${cat.id}',{visible:this.checked})`, 'ظاهر في المنيو')}
       </div>
       <div class="admin-row-actions">
-        ${cat.displayType !== 'image' ? `<button class="admin-btn edit" onclick="window.__adminOpenCategory('${cat.id}')">الأصناف</button>` : ''}
+        ${cat.displayType !== 'image' ? `<button class="admin-btn edit" onclick="window.__adminOpenCategory('${cat.id}')">الأصناف ›</button>` : ''}
         <button class="admin-btn del" onclick="window.__adminDeleteCategory('${cat.id}')">حذف 🗑</button>
       </div>
     </div>
@@ -408,28 +452,41 @@ function renderAdminItemsEditor(catId) {
   const cat = liveState.categories.find(c => c.id === catId);
   if (!cat) { adminEditingCategoryId = null; return renderAdminCategoriesEditor(); }
   const items = liveState.products[catId] || [];
+  const hiddenItems = items.filter(i => !i.visible).length;
+  const withPrice = items.filter(i => i.price != null).length;
+
   let html = `<button class="admin-btn back-to-cats" onclick="window.__adminBackToCats()">→ رجوع للأقسام</button>`;
-  html += `<div class="admin-section-title">أصناف: ${escAttr(cat.name)} (${items.length})</div>`;
+  html += `
+    <div class="admin-stats-row">
+      <div class="admin-stat-card"><div class="admin-stat-num">${items.length}</div><div class="admin-stat-label">أصناف</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-num">${withPrice}</div><div class="admin-stat-label">بسعر</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-num">${hiddenItems}</div><div class="admin-stat-label">مخفية</div></div>
+    </div>`;
+  html += adminSearchBar('دور على صنف...');
+  html += `<div class="admin-section-title">أصناف: ${escAttr(cat.name)}</div>`;
+
+  if (!items.length) {
+    html += `<div class="admin-empty-state">القسم ده لسه فاضي — ضيفي أول صنف 👇</div>`;
+  }
+
   html += items.map(item => `
-    <div class="admin-card-row">
+    <div class="admin-card-row" data-search="${escAttr((item.name || '').toLowerCase())}">
       <img src="${item.imageUrl}" alt=""/>
       <div class="admin-field-col">
         <input class="admin-name" value="${escAttr(item.name)}" onchange="window.__adminUpdateProduct('${item.id}',{name:this.value})" placeholder="اسم الصنف"/>
-        <input type="number" value="${item.price !== undefined && item.price !== null ? item.price : ''}" onchange="window.__adminUpdateProductPrice('${item.id}',this.value)" placeholder="السعر (فاضي = بدون سعر)"/>
+        <input type="number" value="${item.price !== undefined && item.price !== null ? item.price : ''}" onchange="window.__adminUpdateProductPrice('${item.id}',this.value)" placeholder="السعر AED (فاضي = بدون سعر)"/>
         <input type="text" value="${escAttr(item.description || '')}" onchange="window.__adminUpdateProduct('${item.id}',{description:this.value})" placeholder="الوصف"/>
-        <input type="number" min="0" max="5" step="0.1" value="${item.rating != null ? item.rating : ''}" onchange="window.__adminUpdateProduct('${item.id}',{rating:this.value===''?null:Number(this.value)})" placeholder="التقييم (0-5، فاضي = بدون تقييم)"/>
-        <div style="display:flex;gap:6px;">
-          <input type="number" style="flex:1;" value="${item.nutrition?.calories != null ? item.nutrition.calories : ''}" onchange="window.__adminUpdateNutrition('${item.id}','calories',this.value)" placeholder="سعرات"/>
-          <input type="number" style="flex:1;" value="${item.nutrition?.protein != null ? item.nutrition.protein : ''}" onchange="window.__adminUpdateNutrition('${item.id}','protein',this.value)" placeholder="بروتين g"/>
-          <input type="number" style="flex:1;" value="${item.nutrition?.fat != null ? item.nutrition.fat : ''}" onchange="window.__adminUpdateNutrition('${item.id}','fat',this.value)" placeholder="دهون g"/>
-          <input type="number" style="flex:1;" value="${item.nutrition?.carb != null ? item.nutrition.carb : ''}" onchange="window.__adminUpdateNutrition('${item.id}','carb',this.value)" placeholder="كارب g"/>
+        <input type="number" min="0" max="5" step="0.1" value="${item.rating != null ? item.rating : ''}" onchange="window.__adminUpdateProduct('${item.id}',{rating:this.value===''?null:Number(this.value)})" placeholder="التقييم (0-5)"/>
+        <div class="admin-nutri-row">
+          <input type="number" value="${item.nutrition?.calories != null ? item.nutrition.calories : ''}" onchange="window.__adminUpdateNutrition('${item.id}','calories',this.value)" placeholder="سعرات"/>
+          <input type="number" value="${item.nutrition?.protein != null ? item.nutrition.protein : ''}" onchange="window.__adminUpdateNutrition('${item.id}','protein',this.value)" placeholder="بروتين"/>
+          <input type="number" value="${item.nutrition?.fat != null ? item.nutrition.fat : ''}" onchange="window.__adminUpdateNutrition('${item.id}','fat',this.value)" placeholder="دهون"/>
+          <input type="number" value="${item.nutrition?.carb != null ? item.nutrition.carb : ''}" onchange="window.__adminUpdateNutrition('${item.id}','carb',this.value)" placeholder="كارب"/>
         </div>
         <label class="admin-btn edit" style="text-align:center;display:block;">📷 غيّر الصورة
           <input type="file" accept="image/*" style="display:none" data-prod-img="${item.id}"/>
         </label>
-        <label style="font-size:12px;display:flex;align-items:center;gap:6px;">
-          <input type="checkbox" ${item.visible ? 'checked' : ''} onchange="window.__adminUpdateProduct('${item.id}',{visible:this.checked})"/> ظاهر
-        </label>
+        ${toggleField(item.id, item.visible, `window.__adminUpdateProduct('${item.id}',{visible:this.checked})`, 'ظاهر في المنيو')}
       </div>
       <div class="admin-row-actions">
         <button class="admin-btn del" onclick="window.__adminDeleteProduct('${item.id}')">حذف 🗑</button>
