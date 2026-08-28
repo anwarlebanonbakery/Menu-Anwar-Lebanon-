@@ -36,7 +36,7 @@ let scrollTicking = false;
 const scrollMoreIndicatorEl = document.getElementById('scrollMoreIndicator');
 const viewHomeEl = document.getElementById('view-home');
 function checkScrollIndicator() {
-  if (!scrollMoreIndicatorEl || !viewHomeEl) return;
+  if (!scrollMoreIndicatorEl) return;
   const atBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 24);
   const homeActive = viewHomeEl.classList.contains('active');
   scrollMoreIndicatorEl.classList.toggle('show', homeActive && !atBottom);
@@ -92,8 +92,7 @@ function buildBadgeHTML(item) {
 
 let currentCategoryId = null;
 
-function openCategory(catId, opts = {}) {
-  const { silent = false } = opts; // silent = تحديث المحتوى بس، من غير تغيير الشاشة أو تصفير السكرول (بيُستخدم مع الـ polling)
+function openCategory(catId) {
   const cat = liveState.categories.find(c => c.id === catId);
   if (!cat) return;
   currentCategoryId = catId;
@@ -113,6 +112,7 @@ function openCategory(catId, opts = {}) {
   items.forEach(item => {
     const card = document.createElement('div');
     card.className = 'prod-card' + (item.wide ? ' wide' : '') + (item.tall ? ' tall' : '');
+    card.onclick = () => openProduct(item.id);
     let extras = '';
     if (item.sizes && item.sizes.length) extras += `<div class="prod-sizes">${item.sizes.map(s => `<span class="prod-size-chip">${s}</span>`).join('')}</div>`;
     if (item.flavors && item.flavors.length) extras += `<div class="prod-flavors">${item.flavors.map(f => `<span class="prod-flavor-chip">${f}</span>`).join('')}</div>`;
@@ -140,25 +140,19 @@ function openCategory(catId, opts = {}) {
   grid.querySelectorAll('.prod-img').forEach(img => setupImageLoading(img, fallbackImg));
 
   const cards = grid.querySelectorAll('.prod-card');
-  if (silent) {
-    // تحديث في الخلفية بس (بولينج) — من غير تأخير أو أنيميشن يلفت النظر وسط قراءة العميل
-    cards.forEach(c => c.classList.add('show'));
-  } else {
-    cards.forEach((c, i) => { c.style.transitionDelay = (Math.min(i, 10) * 50) + 'ms'; });
-    requestAnimationFrame(() => requestAnimationFrame(() => cards.forEach(c => c.classList.add('show'))));
-  }
+  cards.forEach((c, i) => { c.style.transitionDelay = (Math.min(i, 10) * 50) + 'ms'; });
+  requestAnimationFrame(() => requestAnimationFrame(() => cards.forEach(c => c.classList.add('show'))));
 
-  if (!silent) {
-    document.getElementById('view-home').classList.remove('active');
-    document.getElementById('view-inner').classList.add('active');
-    window.scrollTo(0, 0);
-  }
+  document.getElementById('view-home').classList.remove('active');
+  document.getElementById('view-inner').classList.add('active');
+  window.scrollTo(0, 0);
 }
 window.openCategory = openCategory;
 
 function goHome() {
   document.getElementById('view-inner').classList.remove('active');
   document.getElementById('view-image').classList.remove('active');
+  document.getElementById('view-product').classList.remove('active');
   document.getElementById('view-home').classList.add('active');
   window.scrollTo(0, 0);
   setTimeout(checkScrollIndicator, 200);
@@ -175,12 +169,100 @@ function openImageMenu(imgUrl, title) {
 }
 window.openImageMenu = openImageMenu;
 
+/* ══════════════════════════════════════
+   صفحة تفاصيل الصنف
+══════════════════════════════════════ */
+let currentProductFav = false;
+
+function findProductById(id) {
+  for (const catId in liveState.products) {
+    const found = (liveState.products[catId] || []).find(p => p.id === id);
+    if (found) return found;
+  }
+  return null;
+}
+
+function openProduct(id) {
+  const item = findProductById(id);
+  if (!item) return;
+  currentProductFav = false;
+
+  document.getElementById('pd-fav-btn').textContent = '🤍';
+  document.getElementById('pd-fav-btn').classList.remove('active');
+  const heroImg = document.getElementById('pd-hero-img');
+  heroImg.classList.remove('img-loaded');
+  heroImg.src = item.imageUrl;
+  setupImageLoading(heroImg, fallbackImg);
+
+  document.getElementById('pd-name').textContent = item.name;
+  document.getElementById('pd-price').textContent = (item.price !== undefined && item.price !== null) ? `${item.price} AED` : '—';
+
+  const ratingRow = document.getElementById('pd-rating-row');
+  if (item.rating) {
+    const full = Math.round(item.rating);
+    document.getElementById('pd-stars').textContent = '★'.repeat(full) + '☆'.repeat(5 - full);
+    document.getElementById('pd-rating-num').textContent = `(${item.rating})`;
+    ratingRow.style.display = 'flex';
+  } else {
+    ratingRow.style.display = 'none';
+  }
+
+  let chipsHtml = '';
+  if (item.sizes && item.sizes.length) chipsHtml += `<div class="prod-sizes">${item.sizes.map(s => `<span class="prod-size-chip">${s}</span>`).join('')}</div>`;
+  if (item.flavors && item.flavors.length) chipsHtml += `<div class="prod-flavors">${item.flavors.map(f => `<span class="prod-flavor-chip">${f}</span>`).join('')}</div>`;
+  if (item.manaeshTypes && item.manaeshTypes.length) chipsHtml += `<div class="manaesh-types">${item.manaeshTypes.map(t => `<span class="manaesh-chip">${t}</span>`).join('')}</div>`;
+  document.getElementById('pd-chips').innerHTML = chipsHtml;
+
+  const n = item.nutrition;
+  const nutritionBlock = document.getElementById('pd-nutrition-block');
+  if (n && (n.calories || n.protein || n.fat || n.carb)) {
+    const grid = document.getElementById('pd-nutrition-grid');
+    grid.innerHTML = [
+      n.calories != null ? `<div class="pd-nutri-item"><div class="pd-nutri-value">${n.calories}</div><div class="pd-nutri-label">سعرة حرارية</div></div>` : '',
+      n.protein != null ? `<div class="pd-nutri-item"><div class="pd-nutri-value">${n.protein}g</div><div class="pd-nutri-label">بروتين</div></div>` : '',
+      n.fat != null ? `<div class="pd-nutri-item"><div class="pd-nutri-value">${n.fat}g</div><div class="pd-nutri-label">دهون</div></div>` : '',
+      n.carb != null ? `<div class="pd-nutri-item"><div class="pd-nutri-value">${n.carb}g</div><div class="pd-nutri-label">كارب</div></div>` : '',
+    ].join('');
+    nutritionBlock.style.display = 'block';
+  } else {
+    nutritionBlock.style.display = 'none';
+  }
+
+  const descBlock = document.getElementById('pd-desc-block');
+  if (item.description) {
+    document.getElementById('pd-desc').textContent = item.description;
+    descBlock.style.display = 'block';
+  } else {
+    descBlock.style.display = 'none';
+  }
+
+  document.querySelectorAll('.menu-view.active').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-product').classList.add('active');
+  window.scrollTo(0, 0);
+}
+window.openProduct = openProduct;
+
+function closeProduct() {
+  document.getElementById('view-product').classList.remove('active');
+  document.getElementById('view-inner').classList.add('active');
+  setTimeout(checkScrollIndicator, 200);
+}
+window.closeProduct = closeProduct;
+
+function toggleProductFav() {
+  currentProductFav = !currentProductFav;
+  const btn = document.getElementById('pd-fav-btn');
+  btn.textContent = currentProductFav ? '❤️' : '🤍';
+  btn.classList.toggle('active', currentProductFav);
+}
+window.toggleProductFav = toggleProductFav;
+
 /* ── إعادة رسم كل حاجة بعد كل تحديث بيانات ── */
 function renderAll() {
   renderHomeGrid();
-  // لو المستخدم واقف جوه قسم مفتوح، حدّثه كمان بنفس اللحظة (silent = من غير ما نصفّر السكرول أو نعيد الأنيميشن)
+  // لو المستخدم واقف جوه قسم مفتوح، حدّثه كمان بنفس اللحظة
   if (currentCategoryId && document.getElementById('view-inner').classList.contains('active')) {
-    openCategory(currentCategoryId, { silent: true });
+    openCategory(currentCategoryId);
   }
   if (liveState.isAdmin && document.getElementById('adminPanel').classList.contains('show')) {
     renderAdminBody();
@@ -225,21 +307,15 @@ resetKioskIdleTimer();
 ══════════════════════════════════════ */
 let logoTapCount = 0;
 let logoTapTimer = null;
-const logoTapEl = document.getElementById('logoTapTarget');
-if (logoTapEl) {
-  logoTapEl.addEventListener('click', () => {
-    logoTapCount++;
-    if (logoTapTimer) clearTimeout(logoTapTimer);
-    logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 1500);
-    if (logoTapCount >= 3) {
-      logoTapCount = 0;
-      openAdminLogin();
-    }
-  });
-} else {
-  // لو الـ id ده مش موجود في الـ HTML (مثلاً وقت لصق التعديلات)، سيبها تكمل من غير ما توقف باقي السكريبت
-  console.warn('logoTapTarget مش موجود — الدخول بـ 3 لمسات مش هيشتغل، تأكد إن الـ id اتحط صح في الـ HTML (خطوة 5)');
-}
+document.getElementById('logoTapTarget').addEventListener('click', () => {
+  logoTapCount++;
+  if (logoTapTimer) clearTimeout(logoTapTimer);
+  logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 1500);
+  if (logoTapCount >= 3) {
+    logoTapCount = 0;
+    openAdminLogin();
+  }
+});
 
 function showAdminToast(msg) {
   const t = document.getElementById('adminToast');
@@ -340,6 +416,14 @@ function renderAdminItemsEditor(catId) {
       <div class="admin-field-col">
         <input class="admin-name" value="${escAttr(item.name)}" onchange="window.__adminUpdateProduct('${item.id}',{name:this.value})" placeholder="اسم الصنف"/>
         <input type="number" value="${item.price !== undefined && item.price !== null ? item.price : ''}" onchange="window.__adminUpdateProductPrice('${item.id}',this.value)" placeholder="السعر (فاضي = بدون سعر)"/>
+        <input type="text" value="${escAttr(item.description || '')}" onchange="window.__adminUpdateProduct('${item.id}',{description:this.value})" placeholder="الوصف"/>
+        <input type="number" min="0" max="5" step="0.1" value="${item.rating != null ? item.rating : ''}" onchange="window.__adminUpdateProduct('${item.id}',{rating:this.value===''?null:Number(this.value)})" placeholder="التقييم (0-5، فاضي = بدون تقييم)"/>
+        <div style="display:flex;gap:6px;">
+          <input type="number" style="flex:1;" value="${item.nutrition?.calories != null ? item.nutrition.calories : ''}" onchange="window.__adminUpdateNutrition('${item.id}','calories',this.value)" placeholder="سعرات"/>
+          <input type="number" style="flex:1;" value="${item.nutrition?.protein != null ? item.nutrition.protein : ''}" onchange="window.__adminUpdateNutrition('${item.id}','protein',this.value)" placeholder="بروتين g"/>
+          <input type="number" style="flex:1;" value="${item.nutrition?.fat != null ? item.nutrition.fat : ''}" onchange="window.__adminUpdateNutrition('${item.id}','fat',this.value)" placeholder="دهون g"/>
+          <input type="number" style="flex:1;" value="${item.nutrition?.carb != null ? item.nutrition.carb : ''}" onchange="window.__adminUpdateNutrition('${item.id}','carb',this.value)" placeholder="كارب g"/>
+        </div>
         <label class="admin-btn edit" style="text-align:center;display:block;">📷 غيّر الصورة
           <input type="file" accept="image/*" style="display:none" data-prod-img="${item.id}"/>
         </label>
@@ -419,6 +503,14 @@ window.__adminUpdateProductPrice = async (id, value) => {
   await fetchMenuData();
   showAdminToast('✅ اتحفظ');
 };
+window.__adminUpdateNutrition = async (id, field, value) => {
+  const item = findProductById(id);
+  const nutrition = { calories: null, protein: null, fat: null, carb: null, ...(item && item.nutrition ? item.nutrition : {}) };
+  nutrition[field] = value === '' ? null : Number(value);
+  await updateProduct(id, { nutrition });
+  await fetchMenuData();
+  showAdminToast('✅ اتحفظ');
+};
 window.__adminDeleteProduct = async (id) => {
   if (!confirm('تأكيد حذف الصنف؟')) return;
   await deleteProduct(id);
@@ -429,7 +521,7 @@ window.__adminDeleteProduct = async (id) => {
 window.__adminAddProduct = async (catId) => {
   const items = liveState.products[catId] || [];
   const maxOrder = items.reduce((m, p) => Math.max(m, p.displayOrder || 0), -1);
-  await createProduct({ name: 'صنف جديد', categoryId: catId, imageUrl: fallbackImg, price: null, description: '', flavors: [], sizes: [], manaeshTypes: [], wide: false, tall: false, displayOrder: maxOrder + 1, visible: true });
+  await createProduct({ name: 'صنف جديد', categoryId: catId, imageUrl: fallbackImg, price: null, description: '', rating: null, nutrition: { calories: null, protein: null, fat: null, carb: null }, flavors: [], sizes: [], manaeshTypes: [], wide: false, tall: false, displayOrder: maxOrder + 1, visible: true });
   await fetchMenuData();
   renderAdminBody();
 };
