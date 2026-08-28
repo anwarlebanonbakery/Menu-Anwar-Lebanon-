@@ -1871,7 +1871,7 @@ img { -webkit-user-drag: none; }
 
   .home-grid {
     max-width: 1180px;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 24px;
     padding: 34px 44px 60px;
   }
@@ -1884,20 +1884,20 @@ img { -webkit-user-drag: none; }
 
   .products-grid {
     max-width: 1180px;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 22px;
     padding: 34px 44px 70px;
   }
   .prod-card.tall { grid-column: auto; }
 }
 
-/* شاشات ديسك توب واسعة فعلاً (مش تابلت) — توزيعة ديناميكية حسب المساحة */
+/* شاشات ديسك توب واسعة فعلاً (مش تابلت) — نفس المنطق، حدود أعمدة أعرض شوية */
 @media (min-width: 1280px) {
   .home-grid {
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   }
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   }
 }
 
@@ -2280,6 +2280,7 @@ window.openAdminOverlay = function () {
 function closeAdminOverlay() {
   document.getElementById('adminOverlay').classList.remove('show');
   document.querySelector('meta[name="viewport"]').setAttribute('content', KIOSK_VIEWPORT);
+  adminLogout();
 }
 document.getElementById('adminOverlayClose').addEventListener('click', closeAdminOverlay);
 
@@ -2310,7 +2311,7 @@ $('#loginBtn').onclick = async () => {
     err.textContent = 'بيانات دخول غلط';
   }
 };
-$('#logoutBtn').onclick = async () => { await adminLogout(); closeAdminOverlay(); };
+$('#logoutBtn').onclick = () => { closeAdminOverlay(); };
 
 onAuthStateChanged(getAuth(), async (user) => {
   if (user) {
