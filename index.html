@@ -1854,6 +1854,36 @@ img { -webkit-user-drag: none; }
 #logoTapTarget { cursor: default; -webkit-tap-highlight-color: transparent; }
 
 /* ══════════════════════════════════════
+   وضع التابلت (بورتريه ولاندسكيب متوسط) — 600 لـ 899px
+══════════════════════════════════════ */
+@media (min-width: 600px) {
+  .kiosk-top-bar { padding: 16px 28px; }
+  .kiosk-brand-text { font-size: 15px; }
+  .kiosk-brand { min-width: 128px; }
+
+  .menu-hero { height: 300px; max-height: 340px; }
+
+  .home-grid {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 820px;
+    gap: 18px;
+    padding: 22px 24px 40px;
+  }
+
+  .inner-header { padding: 18px 28px; }
+  .inner-title { font-size: 20px; }
+  .inner-banner-wrap, .inner-banner { height: 230px; }
+
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 820px;
+    gap: 18px;
+    padding: 22px 24px 50px;
+  }
+  .prod-card.tall { grid-column: auto; grid-row: auto; }
+}
+
+/* ══════════════════════════════════════
    وضع الديسك توب — توزيعة حقيقية مش مجرد تصغير
 ══════════════════════════════════════ */
 @media (min-width: 900px) {
