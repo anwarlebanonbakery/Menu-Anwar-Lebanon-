@@ -1854,26 +1854,46 @@ img { -webkit-user-drag: none; }
 #logoTapTarget { cursor: default; -webkit-tap-highlight-color: transparent; }
 
 /* ══════════════════════════════════════
-   وضع الديسك توب / شاشة عريضة
-   التطبيق ده مصمم كشاشة كيوسك على تابلت، مش موقع ديسك توب.
-   من غير الجزء ده، أي شاشة أعرض من الموبايل بتبين فاضية:
-   كل العناصر (اوفرلاي البداية، لوحة الأدمن...) بتستخدم
-   position:fixed على الشاشة كلها، فبتتمدد وتبقى شبه مش ظاهرة.
-   الحل: نحط الموقع كله جوه "فريم" بعرض موبايل وسط الشاشة،
-   و transform على body بتخلي كل الـ fixed جواها بس (مش الشاشة كلها).
+   وضع الديسك توب — توزيعة حقيقية مش مجرد تصغير
 ══════════════════════════════════════ */
-@media (min-width: 701px) {
-  html { background: #111; }
-  body {
-    max-width: 480px;
-    margin: 32px auto;
-    min-height: calc(100vh - 64px);
-    position: relative;
-    transform: translate(0); /* يخلي أي position:fixed جواها ياخد حدود الـ body مش الشاشة */
-    overflow: hidden;
-    border-radius: 26px;
-    box-shadow: 0 30px 90px rgba(0,0,0,0.55);
+@media (min-width: 900px) {
+  .kiosk-top-bar { padding: 18px 44px; }
+  .kiosk-brand-text { font-size: 16px; }
+  .kiosk-brand { min-width: 140px; height: 20px; }
+
+  .menu-hero { height: 340px; max-height: 380px; }
+
+  .home-grid {
+    max-width: 1180px;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 24px;
+    padding: 34px 44px 60px;
   }
+  .cat-name { font-size: 17px; }
+  .cat-body { padding: 16px; }
+
+  .inner-header { padding: 20px 44px; }
+  .inner-title { font-size: 21px; }
+  .inner-banner-wrap, .inner-banner { height: 300px; }
+
+  .products-grid {
+    max-width: 1180px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 22px;
+    padding: 34px 44px 70px;
+  }
+  .prod-card.tall { grid-column: auto; }
+
+  /* لوحة الأدمن على الديسك توب — كارت في النص، مش شاشة كاملة ممطوطة */
+  .admin-panel {
+    top: 4vh; bottom: 4vh; left: 50%; right: auto;
+    transform: translateX(-50%);
+    width: 480px; max-width: 92vw;
+    border-radius: 22px; overflow: hidden;
+    box-shadow: 0 40px 110px rgba(0,0,0,0.45);
+  }
+
+  /* اوفرلاي البداية ولوحة الأدمن-PIN تفضل شاشة كاملة (مقصودة أصلاً) */
 }
 
 </style>
