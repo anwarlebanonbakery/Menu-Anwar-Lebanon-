@@ -48,11 +48,12 @@
   --gold:       #B8830A;
   --gold-light: #D4A830;
   --border:     rgba(43,21,6,0.10);
-  /* legacy menu-page variable names, retinted to gold so the
-     product/menu subpages inherit the same identity */
-  --orange:     #B8830A;
-  --orange-l:   #D4A830;
-  --orange-d:   #8C6207;
+  /* legacy menu-page variable names, retinted to red (primary
+     action accent) so the product/menu subpages inherit the new identity */
+  --orange:     #E63946;
+  --orange-l:   #FF6B6B;
+  --orange-d:   #C1121F;
+  --star:       #F4B400;
   --m-brown:    #3B1A05;
   --m-brown-m:  #7A4820;
   --m-brown-l:  #B07040;
@@ -639,12 +640,13 @@ img { -webkit-user-drag: none; }
 .prod-card:hover .prod-img { transform: scale(1.07); }
 .prod-badge {
   position: absolute; top: 8px; right: 8px;
-  background: linear-gradient(135deg, var(--orange), var(--orange-l));
+  background: linear-gradient(135deg, var(--green), var(--green-d));
   color: white; font-family: 'Cairo', sans-serif;
   font-size: 12px; font-weight: 900; padding: 4px 9px; border-radius: 20px;
-  box-shadow: 0 3px 10px rgba(184,131,10,0.35);
+  box-shadow: 0 3px 10px rgba(31,122,77,0.35);
 }
 .prod-badge.no-price { background: linear-gradient(135deg, #999, #bbb); }
+.prod-card { cursor: pointer; }
 .prod-body { padding: 10px 11px 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
 .prod-name { font-size: 13.5px; font-weight: 700; color: var(--m-brown); line-height: 1.35; margin-bottom: 6px; }
 .prod-note { font-size: 11px; color: var(--m-brown-l); margin-bottom: 4px; font-style: italic; }
@@ -653,7 +655,7 @@ img { -webkit-user-drag: none; }
 .prod-sizes { display: flex; gap: 5px; margin-bottom: 6px; }
 .prod-size-chip { background: linear-gradient(135deg, var(--orange-d), var(--orange)); color: white; font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 10px; }
 .prod-price-row { display: flex; align-items: center; justify-content: space-between; }
-.prod-price { font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 900; color: var(--orange); }
+.prod-price { font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 900; color: var(--green); }
 .prod-price.dash { color: #bbb; font-size: 18px; letter-spacing: 1px; }
 .prod-currency { font-size: 10px; font-weight: 600; color: var(--m-brown-l); margin-right: 2px; }
 .prod-heart { width: 28px; height: 28px; border-radius: 50%; background: var(--cream); border: 1px solid var(--cream-d); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: transform .2s; }
@@ -692,6 +694,47 @@ img { -webkit-user-drag: none; }
 
 .menu-view.active .cat-card { animation: cardIn 0.5s ease both; }
 #products-grid .prod-card { transition: opacity .4s ease, transform .4s ease; }
+
+/* ══════════════════════════════════════
+   PRODUCT DETAIL PAGE
+══════════════════════════════════════ */
+.pd-hero-wrap {
+  position: relative; height: 300px; background: #14100F; overflow: hidden;
+}
+.pd-hero-img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity .4s ease; }
+.pd-hero-img.img-loaded { opacity: 1; }
+.pd-hero-top {
+  position: absolute; top: 14px; left: 14px; right: 14px; z-index: 3;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.pd-round-btn {
+  width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer;
+  background: rgba(255,255,255,0.9); color: var(--m-brown);
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+.pd-round-btn.fav.active { color: var(--orange); }
+.pd-body {
+  position: relative; margin-top: -22px; background: var(--white);
+  border-radius: 26px 26px 0 0; padding: 20px 18px 40px;
+  max-width: 600px; margin-left: auto; margin-right: auto;
+}
+.pd-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.pd-name { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 20px; color: var(--m-brown); line-height: 1.3; }
+.pd-price { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 20px; color: var(--green); white-space: nowrap; }
+.pd-meta-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.pd-rating { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--m-brown-m); }
+.pd-rating .stars { color: var(--star); letter-spacing: 1px; }
+.pd-section-label { font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 14px; color: var(--m-brown); margin: 18px 0 10px; }
+.pd-nutrition-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  background: var(--cream); border-radius: 16px; padding: 12px;
+}
+.pd-nutri-item { text-align: center; }
+.pd-nutri-value { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 15px; color: var(--m-brown); }
+.pd-nutri-label { font-size: 10.5px; color: var(--m-brown-l); margin-top: 2px; }
+.pd-desc { font-size: 13.5px; color: var(--m-brown-m); line-height: 1.7; margin-top: 4px; }
+.pd-chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 
 /* ══════════════════════════════════════
    BRANCHES PAGE (full listing subpage)
@@ -2023,6 +2066,34 @@ img { -webkit-user-drag: none; }
     </div>
     <div class="image-menu-wrap">
       <img class="image-menu-photo" id="image-menu-photo" src="" alt="" loading="lazy" decoding="async"/>
+    </div>
+  </div>
+
+  <div class="menu-view" id="view-product">
+    <div class="pd-hero-wrap">
+      <div class="pd-hero-top">
+        <button class="pd-round-btn" onclick="closeProduct()">→</button>
+        <button class="pd-round-btn fav" id="pd-fav-btn" onclick="toggleProductFav()">🤍</button>
+      </div>
+      <img class="pd-hero-img" id="pd-hero-img" src="" alt="" loading="lazy" decoding="async"/>
+    </div>
+    <div class="pd-body">
+      <div class="pd-title-row">
+        <div class="pd-name" id="pd-name"></div>
+        <div class="pd-price" id="pd-price"></div>
+      </div>
+      <div class="pd-meta-row" id="pd-rating-row" style="display:none;">
+        <div class="pd-rating"><span class="stars" id="pd-stars"></span><span id="pd-rating-num"></span></div>
+      </div>
+      <div id="pd-chips"></div>
+      <div id="pd-nutrition-block" style="display:none;">
+        <div class="pd-section-label">القيمة الغذائية</div>
+        <div class="pd-nutrition-grid" id="pd-nutrition-grid"></div>
+      </div>
+      <div id="pd-desc-block" style="display:none;">
+        <div class="pd-section-label">الوصف</div>
+        <div class="pd-desc" id="pd-desc"></div>
+      </div>
     </div>
   </div>
 
