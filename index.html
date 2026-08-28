@@ -64,11 +64,6 @@
   --green-deep:   #0D3622;
   --green-deep-grad: linear-gradient(135deg, #0A2E1C 0%, #14432B 55%, #1C5C3C 100%);
   --bg: var(--cream);
-  /* tablet-display refinements */
-  --shadow-card:     0 4px 18px rgba(58,26,5,0.07);
-  --shadow-card-lg:  0 18px 46px rgba(58,26,5,0.14);
-  --gold-foil:       linear-gradient(135deg, #D4A830 0%, #B8830A 45%, #8C6207 100%);
-  --hairline-gold:   linear-gradient(90deg, transparent, rgba(212,168,48,0.55), transparent);
 }
 
 html, body { height: 100%; }
@@ -404,13 +399,29 @@ button { font: inherit; }
   background: var(--green-deep-grad);
   padding: 12px 18px;
   display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-  position: relative;
 }
-.kiosk-top-bar::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
-  background: var(--hairline-gold);
+.kiosk-brand { position: relative; display: inline-block; min-width: 118px; height: 18px; vertical-align: middle; }
+.kiosk-brand-text {
+  position: absolute; inset: 0; white-space: nowrap;
+  font-family:'Tajawal',sans-serif; font-size: 14px; font-weight: 800; color: #fff;
 }
-.kiosk-brand { font-family:'Tajawal',sans-serif; font-size: 14px; font-weight: 800; color: #fff; }
+.kiosk-brand-text.en { font-family: 'Poppins', 'Tajawal', sans-serif; letter-spacing: 0.3px; }
+@keyframes brandFadeAr {
+  0%, 45% { opacity: 1; transform: translateY(0); }
+  50%, 95% { opacity: 0; transform: translateY(-4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes brandFadeEn {
+  0%, 45% { opacity: 0; transform: translateY(4px); }
+  50%, 95% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(4px); }
+}
+.kiosk-brand-text.ar { animation: brandFadeAr 6s ease-in-out infinite; }
+.kiosk-brand-text.en { animation: brandFadeEn 6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .kiosk-brand-text.ar { opacity: 1; animation: none; }
+  .kiosk-brand-text.en { opacity: 0; animation: none; }
+}
 .kiosk-clock { font-family:'Tajawal',sans-serif; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.85); direction: ltr; }
 
 /* ── Kiosk mode: block gestures that break a fixed in-store display ── */
@@ -612,7 +623,6 @@ img { -webkit-user-drag: none; }
 }
 .prod-card.show { opacity: 1; transform: none; }
 .prod-card.show:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(58,26,5,0.11); }
-.prod-card.show:active { transform: scale(0.97); }
 .prod-card.wide { grid-column: 1 / -1; flex-direction: row; align-items: stretch; }
 .prod-card.wide .prod-img-wrap { width: 140px; min-width: 140px; aspect-ratio: auto; flex-shrink: 0; }
 .prod-card.wide .prod-img { height: 100%; object-fit: cover; }
@@ -651,81 +661,6 @@ img { -webkit-user-drag: none; }
 @media(max-width:400px) {
   .home-grid { gap: 12px; padding: 14px 12px 8px; }
   .menu-hero { max-height: 260px; }
-}
-
-/* ══════════════════════════════════════
-   عرض التابلت — الكيوسك في المحل
-   (بيشتغل على الطولي والعرضي، الفاصل على العرض الفعلي للشاشة)
-══════════════════════════════════════ */
-@media (min-width: 700px) {
-  .kiosk-top-bar { padding: 18px 34px; }
-  .kiosk-brand { font-size: 19px; }
-  .kiosk-clock { font-size: 17px; }
-
-  .home-grid {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 920px; gap: 22px; padding: 28px 30px 40px;
-  }
-  .cat-card { border-radius: 26px; box-shadow: var(--shadow-card); }
-  .cat-card:hover { box-shadow: var(--shadow-card-lg); }
-  .cat-img-wrap { border-radius: 26px 26px 0 0; }
-  .cat-body { padding: 18px 16px; }
-  .cat-name { font-size: 19px; }
-  .cat-arrow { width: 36px; height: 36px; font-size: 16px; }
-  .cat-count { font-size: 13.5px; }
-
-  .inner-header { padding: 18px 30px; }
-  .inner-title { font-size: 23px; }
-  .inner-emoji { font-size: 26px; }
-  .inner-banner-wrap, .inner-banner { height: min(30vh, 320px); }
-  .banner-tag { font-size: 14.5px; padding: 6px 18px; }
-
-  .products-grid {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 1040px; gap: 22px; padding: 28px 30px 50px;
-  }
-  .prod-card { border-radius: 22px; }
-  .prod-name { font-size: 15.5px; }
-  .prod-price { font-size: 18px; }
-  .prod-badge { font-size: 13px; padding: 5px 11px; }
-  .prod-heart { width: 32px; height: 32px; font-size: 16px; }
-  .prod-body { padding: 14px 15px 15px; }
-}
-
-@media (min-width: 1000px) {
-  .kiosk-top-bar { padding: 22px 44px; }
-  .kiosk-brand { font-size: 22px; }
-  .kiosk-clock { font-size: 18px; }
-
-  .home-grid {
-    grid-template-columns: repeat(4, 1fr);
-    max-width: 1280px; gap: 26px; padding: 36px 40px 46px;
-  }
-  .cat-name { font-size: 20px; }
-  .cat-body { padding: 20px 18px; }
-
-  .inner-header { padding: 20px 40px; }
-  .inner-title { font-size: 25px; }
-  .inner-banner-wrap, .inner-banner { height: min(32vh, 380px); }
-
-  .products-grid {
-    grid-template-columns: repeat(4, 1fr);
-    max-width: 1440px; gap: 24px; padding: 32px 40px 56px;
-  }
-  .prod-card.wide { grid-column: span 2; }
-  .prod-name { font-size: 16.5px; }
-  .prod-price { font-size: 19px; }
-}
-
-@media (min-width: 1300px) {
-  .home-grid, .products-grid { gap: 30px; }
-  .prod-card:not(.wide) { max-width: none; }
-}
-
-/* لمس أفضل ووضوح تركيز على الأزرار الرئيسية عند التنقل بلوحة مفاتيح خارجية */
-.cat-card:focus-visible, .prod-card:focus-visible,
-.inner-back-btn:focus-visible, .main-back-btn:focus-visible {
-  outline: 2px solid var(--gold-light); outline-offset: 2px;
 }
 
 @keyframes skeletonPulse { 0%, 100% { background-color: #EFE8D8; } 50% { background-color: #F7F2E6; } }
@@ -1918,6 +1853,29 @@ img { -webkit-user-drag: none; }
 /* اللوجو — مؤشر إنه قابل للمس (بدون ما يبان أدمن) */
 #logoTapTarget { cursor: default; -webkit-tap-highlight-color: transparent; }
 
+/* ══════════════════════════════════════
+   وضع الديسك توب / شاشة عريضة
+   التطبيق ده مصمم كشاشة كيوسك على تابلت، مش موقع ديسك توب.
+   من غير الجزء ده، أي شاشة أعرض من الموبايل بتبين فاضية:
+   كل العناصر (اوفرلاي البداية، لوحة الأدمن...) بتستخدم
+   position:fixed على الشاشة كلها، فبتتمدد وتبقى شبه مش ظاهرة.
+   الحل: نحط الموقع كله جوه "فريم" بعرض موبايل وسط الشاشة،
+   و transform على body بتخلي كل الـ fixed جواها بس (مش الشاشة كلها).
+══════════════════════════════════════ */
+@media (min-width: 701px) {
+  html { background: #111; }
+  body {
+    max-width: 480px;
+    margin: 32px auto;
+    min-height: calc(100vh - 64px);
+    position: relative;
+    transform: translate(0); /* يخلي أي position:fixed جواها ياخد حدود الـ body مش الشاشة */
+    overflow: hidden;
+    border-radius: 26px;
+    box-shadow: 0 30px 90px rgba(0,0,0,0.55);
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1963,7 +1921,10 @@ img { -webkit-user-drag: none; }
 
   <div class="menu-view active" id="view-home">
     <div class="kiosk-top-bar">
-      <span class="kiosk-brand" id="logoTapTarget">🥐 أنوار لبنان للمخبوزات والحلويات</span>
+      <span class="kiosk-brand" id="logoTapTarget">
+        <span class="kiosk-brand-text ar">🥐 أنوار لبنان</span>
+        <span class="kiosk-brand-text en">🥐 Anwar Lebanon</span>
+      </span>
       <span class="kiosk-clock" id="kioskClock"></span>
     </div>
 
