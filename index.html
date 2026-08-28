@@ -1931,6 +1931,527 @@ img { -webkit-user-drag: none; }
   /* اوفرلاي البداية ولوحة الأدمن-PIN تفضل شاشة كاملة (مقصودة أصلاً) */
 }
 
+/* ══════════════════════════════════════
+   PRODUCTION UI LAYER
+   Responsive polish for the real menu data.
+   This layer changes presentation only — it
+   deliberately does not create or alter content.
+ ══════════════════════════════════════ */
+:root {
+  --ui-ink: #173126;
+  --ui-muted: #718078;
+  --ui-line: rgba(22, 67, 44, .12);
+  --ui-surface: #ffffff;
+  --ui-bg: #f5f8f5;
+  --ui-shadow: 0 16px 40px rgba(17, 57, 38, .08);
+}
+
+button, a, input { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible {
+  outline: 3px solid rgba(212,168,48,.55);
+  outline-offset: 3px;
+}
+
+/* ── Customer menu: calmer chrome and more useful space ── */
+#page-menu {
+  background:
+    radial-gradient(circle at 92% 12%, rgba(212,168,48,.10), transparent 24rem),
+    linear-gradient(180deg, #f8faf7 0%, #f2f6f2 100%);
+}
+
+#page-menu .kiosk-top-bar {
+  min-height: 64px;
+  padding: 12px clamp(16px, 4vw, 52px);
+  background: rgba(8, 45, 28, .97);
+  box-shadow: 0 8px 24px rgba(8,45,28,.14);
+  position: relative;
+  z-index: 20;
+}
+
+#page-menu .kiosk-brand { min-height: 40px; }
+#page-menu .kiosk-logo-img {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.08);
+}
+#page-menu .kiosk-brand-text { font-size: 15px; }
+#page-menu .kiosk-clock {
+  padding: 7px 12px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 12px;
+  background: rgba(255,255,255,.08);
+  font-size: 12px;
+}
+
+#page-menu .menu-hero {
+  height: clamp(230px, 34vw, 410px);
+  max-height: none;
+  min-height: 230px;
+  background-position: center 42%;
+  isolation: isolate;
+}
+#page-menu .menu-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(8,45,28,.05), rgba(8,45,28,.68)),
+    linear-gradient(90deg, rgba(8,45,28,.36), transparent 68%);
+  z-index: 0;
+}
+#page-menu .menu-hero::after {
+  content: 'أنوار لبنان';
+  position: absolute;
+  right: clamp(20px, 7vw, 88px);
+  bottom: clamp(22px, 5vw, 52px);
+  color: rgba(255,255,255,.96);
+  font-family: 'Lalezar', cursive;
+  font-size: clamp(32px, 5vw, 62px);
+  line-height: 1;
+  text-shadow: 0 8px 24px rgba(0,0,0,.28);
+  z-index: 1;
+}
+
+#page-menu > .menu-view > div[style*="flex:1"] {
+  background: transparent !important;
+}
+
+#page-menu .home-grid,
+#page-menu .products-grid {
+  --cols-mobile: 2;
+  --cols-tablet: 3;
+  --cols-desktop: 4;
+  grid-template-columns: repeat(var(--cols-mobile), minmax(0, 1fr));
+  width: min(100%, 1280px);
+  max-width: none;
+  gap: clamp(12px, 1.7vw, 24px);
+  margin-inline: auto;
+  padding: clamp(18px, 3vw, 38px) clamp(14px, 4vw, 52px) clamp(34px, 5vw, 70px);
+}
+
+#page-menu .cat-card,
+#page-menu .prod-card {
+  min-width: 0;
+  border: 1px solid rgba(31,122,77,.13);
+  border-radius: 24px;
+  box-shadow: 0 8px 24px rgba(13,54,34,.065);
+  background: linear-gradient(145deg, #fff 0%, #fbfdfb 100%);
+  animation-delay: calc(var(--card-index, 0) * 55ms);
+}
+#page-menu .cat-card:hover,
+#page-menu .prod-card.show:hover {
+  border-color: rgba(31,122,77,.28);
+  box-shadow: 0 18px 38px rgba(13,54,34,.13);
+}
+#page-menu .home-grid > .cat-card.wide,
+#page-menu .products-grid > .prod-card.wide {
+  grid-column: auto;
+}
+#page-menu .products-grid > .prod-card.tall {
+  grid-column: auto;
+  grid-row: auto;
+  min-height: 0;
+}
+#page-menu .products-grid > .prod-card.wide {
+  flex-direction: column;
+}
+#page-menu .products-grid > .prod-card.wide .prod-img-wrap {
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 4 / 3;
+}
+
+#page-menu .cat-img-wrap { aspect-ratio: 1.28 / 1; }
+#page-menu .cat-body { padding: clamp(12px, 1.5vw, 18px); }
+#page-menu .cat-name { font-size: clamp(14px, 1.7vw, 19px); }
+#page-menu .cat-arrow { width: 44px; height: 44px; min-width: 44px; }
+#page-menu .cat-count { min-height: 30px; }
+
+#page-menu .prod-img-wrap { aspect-ratio: 1.16 / 1; }
+#page-menu .prod-body { padding: 13px 14px 15px; }
+#page-menu .prod-name { font-size: clamp(13px, 1.35vw, 16px); }
+#page-menu .prod-price { font-size: clamp(15px, 1.5vw, 18px); }
+#page-menu .prod-heart { width: 44px; height: 44px; }
+
+#page-menu .inner-header {
+  min-height: 68px;
+  padding: 12px clamp(14px, 4vw, 52px);
+  gap: 12px;
+  border-bottom: 1px solid rgba(31,122,77,.10);
+}
+#page-menu .inner-back-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  background: #eef5ef;
+  border-color: rgba(31,122,77,.12);
+  font-size: 20px;
+}
+#page-menu .inner-title {
+  min-width: 0;
+  font-size: clamp(17px, 2vw, 23px);
+  overflow-wrap: anywhere;
+}
+#page-menu .inner-banner-wrap,
+#page-menu .inner-banner { height: clamp(170px, 24vw, 320px); }
+
+/* ── Admin dashboard: full workspace on desktop, drawer on mobile ── */
+.admin-panel {
+  inset: 0;
+  width: auto;
+  max-width: none;
+  transform: none;
+  border-radius: 0;
+  overflow: hidden;
+  background: var(--ui-bg);
+  color: var(--ui-ink);
+}
+.admin-panel.show { display: flex; }
+.admin-header {
+  min-height: 76px;
+  padding: 14px clamp(14px, 3vw, 42px);
+  background: linear-gradient(135deg, #092d1c 0%, #155238 58%, #25764e 100%);
+  box-shadow: 0 8px 28px rgba(8,45,28,.18);
+  position: relative;
+  z-index: 10;
+}
+.admin-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.admin-brand-mark,
+.admin-sidebar-logo {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  color: #f9dc87;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.18);
+  font-size: 20px;
+}
+.admin-header h2 { font-size: clamp(15px, 2vw, 19px); letter-spacing: -.2px; }
+.admin-header-subtitle {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255,255,255,.64);
+  font-size: 11px;
+  font-weight: 500;
+}
+.admin-header-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.admin-menu-btn,
+.admin-close-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 13px;
+  background: rgba(255,255,255,.10);
+  color: #fff;
+  cursor: pointer;
+  font-size: 19px;
+}
+.admin-menu-btn { display: none; }
+.admin-close-btn { font-size: 18px; }
+.admin-layout {
+  display: grid;
+  grid-template-columns: 276px minmax(0, 1fr);
+  direction: rtl;
+  min-height: 0;
+  flex: 1;
+}
+.admin-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+  padding: 28px 20px;
+  background: #103b27;
+  color: #fff;
+  border-left: 1px solid rgba(255,255,255,.06);
+}
+.admin-sidebar-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.admin-sidebar-head strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 900;
+}
+.admin-sidebar-head span {
+  display: block;
+  margin-top: 3px;
+  color: rgba(255,255,255,.58);
+  font-size: 11px;
+}
+.admin-nav-label {
+  color: #e4c86e;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+.admin-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 10px 12px;
+  border-radius: 13px;
+  color: #fff;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.10);
+  font-size: 13px;
+  font-weight: 800;
+}
+.admin-nav-item-icon {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  color: #113b27;
+  background: #f3d77e;
+}
+.admin-sidebar-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: auto;
+  padding: 13px 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px;
+  background: rgba(255,255,255,.06);
+}
+.admin-sidebar-note .status-dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: #63df94;
+  box-shadow: 0 0 0 4px rgba(99,223,148,.12);
+}
+.admin-sidebar-note strong,
+.admin-sidebar-note small { display: block; }
+.admin-sidebar-note strong { font-size: 11px; }
+.admin-sidebar-note small { margin-top: 3px; color: rgba(255,255,255,.58); font-size: 10px; line-height: 1.5; }
+.admin-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 0 0, rgba(212,168,48,.10), transparent 22rem),
+    var(--ui-bg);
+}
+.admin-main-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: clamp(22px, 4vw, 42px) clamp(16px, 5vw, 64px) 8px;
+}
+.admin-kicker {
+  color: #9a751a;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+.admin-main-head h3 {
+  margin-top: 5px;
+  color: var(--ui-ink);
+  font-size: clamp(22px, 3vw, 31px);
+  font-weight: 900;
+}
+.admin-main-head p {
+  margin-top: 5px;
+  color: var(--ui-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+.admin-body {
+  flex: 1;
+  padding: 14px clamp(16px, 5vw, 64px) 34px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.admin-section-title {
+  margin: 20px 0 12px;
+  color: var(--ui-ink);
+  font-size: 15px;
+}
+.admin-card-row {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  min-height: 88px;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid var(--ui-line);
+  border-radius: 18px;
+  background: rgba(255,255,255,.94);
+  box-shadow: 0 6px 18px rgba(17,57,38,.05);
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+.admin-card-row:hover {
+  border-color: rgba(31,122,77,.28);
+  box-shadow: 0 12px 26px rgba(17,57,38,.09);
+  transform: translateY(-1px);
+}
+.admin-card-row img {
+  width: 68px;
+  height: 68px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: #edf2ed;
+}
+.admin-field-col { gap: 7px; }
+.admin-field-col input {
+  min-height: 42px;
+  padding: 9px 11px;
+  border-color: #dce7df;
+  border-radius: 11px;
+  background: #fbfdfb;
+  color: var(--ui-ink);
+}
+.admin-field-col input:focus {
+  border-color: #2d9460;
+  box-shadow: 0 0 0 3px rgba(45,148,96,.12);
+}
+.admin-field-col input.admin-name { font-size: 15px; }
+.admin-row-actions {
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+}
+.admin-btn {
+  min-height: 44px;
+  padding: 9px 13px;
+  border-radius: 11px;
+  transition: transform .18s, filter .18s;
+}
+.admin-btn:hover { filter: brightness(.97); }
+.admin-btn:active { transform: scale(.97); }
+.admin-btn.add {
+  min-height: 48px;
+  margin-top: 8px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #b8830a, #d4a830);
+  box-shadow: 0 8px 18px rgba(184,131,10,.18);
+}
+.admin-btn.back-to-cats { min-height: 44px; }
+.admin-footer {
+  justify-content: flex-start;
+  padding: 12px clamp(16px, 5vw, 64px);
+  background: rgba(255,255,255,.92);
+  border-top-color: var(--ui-line);
+  box-shadow: 0 -8px 24px rgba(17,57,38,.05);
+}
+.admin-footer .admin-btn.reset {
+  min-width: 110px;
+  background: #eff4ef;
+  color: #35604a;
+}
+.admin-scrim { display: none; }
+
+@media (min-width: 600px) {
+  #page-menu .home-grid,
+  #page-menu .products-grid {
+    grid-template-columns: repeat(var(--cols-tablet), minmax(0, 1fr));
+  }
+}
+@media (min-width: 900px) {
+  #page-menu .home-grid,
+  #page-menu .products-grid {
+    grid-template-columns: repeat(var(--cols-desktop), minmax(0, 1fr));
+  }
+}
+@media (max-width: 899px) {
+  .admin-layout { grid-template-columns: 1fr; }
+  .admin-menu-btn { display: inline-flex; align-items: center; justify-content: center; }
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    width: min(84vw, 310px);
+    box-shadow: -18px 0 46px rgba(0,0,0,.22);
+    transform: translateX(110%);
+    transition: transform .28s cubic-bezier(.2,.8,.2,1);
+  }
+  .admin-panel.sidebar-open .admin-sidebar { transform: translateX(0); }
+  .admin-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: block;
+    background: rgba(4,22,14,.48);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s;
+  }
+  .admin-panel.sidebar-open .admin-scrim {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+@media (max-width: 560px) {
+  #page-menu .kiosk-top-bar { min-height: 58px; }
+  #page-menu .kiosk-logo-img { width: 34px; height: 34px; }
+  #page-menu .kiosk-brand-text { font-size: 13px; }
+  #page-menu .kiosk-clock { padding: 6px 9px; font-size: 11px; }
+  #page-menu .menu-hero { min-height: 220px; }
+  #page-menu .menu-hero::after {
+    right: 18px;
+    bottom: 20px;
+    font-size: 34px;
+  }
+  #page-menu .cat-card,
+  #page-menu .prod-card { border-radius: 18px; }
+  #page-menu .cat-img-wrap { border-radius: 18px 18px 0 0; }
+  .admin-header { min-height: 64px; padding: 10px 12px; }
+  .admin-brand-mark { width: 38px; height: 38px; flex-basis: 38px; border-radius: 11px; }
+  .admin-header-subtitle { display: none; }
+  .admin-main-head { padding: 20px 14px 4px; }
+  .admin-body { padding: 10px 14px 24px; }
+  .admin-card-row {
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    padding: 9px;
+  }
+  .admin-card-row img { width: 54px; height: 54px; border-radius: 11px; }
+  .admin-row-actions {
+    grid-column: 1 / -1;
+    justify-content: stretch;
+  }
+  .admin-row-actions .admin-btn { flex: 1; }
+  .admin-footer { padding: 10px 14px; }
+}
+@media (max-width: 390px) {
+  /* --cols-mobile itself is driven by JS (syncGrid), which already
+     collapses to 1 column at this width; this block only handles the
+     purely visual adjustment. */
+  #page-menu .cat-img-wrap { aspect-ratio: 1.65 / 1; }
+}
+
 </style>
 </head>
 <body>
@@ -1956,10 +2477,52 @@ img { -webkit-user-drag: none; }
 
 <div class="admin-panel" id="adminPanel">
   <div class="admin-header">
-    <h2>لوحة تحكم المنيو</h2>
-    <button class="admin-close-btn" onclick="closeAdminPanel()">✕</button>
+    <div class="admin-header-brand">
+      <div class="admin-brand-mark" aria-hidden="true">✦</div>
+      <div>
+        <h2>لوحة تحكم المنيو</h2>
+        <span class="admin-header-subtitle">إدارة محتوى أنوار لبنان</span>
+      </div>
+    </div>
+    <div class="admin-header-tools">
+      <button class="admin-menu-btn" onclick="toggleAdminSidebar()" aria-label="فتح القائمة" aria-controls="adminSidebar" aria-expanded="false">☰</button>
+      <button class="admin-close-btn" onclick="closeAdminPanel()" aria-label="إغلاق لوحة التحكم">✕</button>
+    </div>
   </div>
-  <div class="admin-body" id="adminBody"></div>
+  <div class="admin-scrim" id="adminScrim" onclick="toggleAdminSidebar()"></div>
+  <div class="admin-layout">
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="قائمة لوحة التحكم">
+      <div class="admin-sidebar-head">
+        <div class="admin-sidebar-logo" aria-hidden="true">✦</div>
+        <div>
+          <strong>أنوار لبنان</strong>
+          <span>لوحة الإدارة</span>
+        </div>
+      </div>
+      <div class="admin-nav-label">المحتوى</div>
+      <div class="admin-nav-item" aria-current="page">
+        <span class="admin-nav-item-icon" aria-hidden="true">▦</span>
+        <span>إدارة المنيو</span>
+      </div>
+      <div class="admin-sidebar-note">
+        <span class="status-dot" aria-hidden="true"></span>
+        <div>
+          <strong>تحكم مباشر</strong>
+          <small>التعديلات تظهر بعد الحفظ</small>
+        </div>
+      </div>
+    </aside>
+    <main class="admin-main">
+      <div class="admin-main-head">
+        <div>
+          <span class="admin-kicker">إدارة المحتوى</span>
+          <h3>الأقسام والمنتجات</h3>
+          <p>حدّث بيانات المنيو الحالية وحالة ظهورها من مكان واحد.</p>
+        </div>
+      </div>
+      <div class="admin-body" id="adminBody"></div>
+    </main>
+  </div>
   <div class="admin-footer">
     <button class="admin-btn reset" onclick="handleAdminLogout()">🚪 خروج</button>
   </div>
@@ -2033,6 +2596,85 @@ img { -webkit-user-drag: none; }
 
 <script type="module" src="./firebase-app.js"></script>
 <script type="module" src="./kiosk-app.js"></script>
+<script>
+  /* Presentation-only helpers. Existing menu data and app actions remain untouched. */
+  (function () {
+    const menuGrids = document.querySelectorAll('#homeGrid, #products-grid');
+
+    // Picks the column count (2..max) that leaves the last row as full as
+    // possible for a given card count, so we never strand a single "orphan"
+    // card beside a big empty gap. Prefers a perfect fit near `max`, then
+    // falls back to the largest column count whose last row has 2+ cards.
+    function balancedColumns(count, max) {
+      if (count <= 1) return 1;
+      if (count <= max) return count;
+      for (let c = max; c >= Math.max(2, max - 1); c--) {
+        if (count % c === 0) return c;
+      }
+      for (let c = max; c >= 2; c--) {
+        if (count % c !== 1) return c;
+      }
+      return max;
+    }
+
+    function mobileColumns(count) {
+      if (count <= 1) return 1;
+      if (window.innerWidth <= 390) return 1;
+      return 2;
+    }
+
+    function syncGrid(grid) {
+      const cards = Array.from(grid.children).filter(function (node) {
+        return node.nodeType === 1;
+      });
+      const count = cards.length;
+      grid.dataset.cardCount = String(count);
+      grid.style.setProperty('--cols-mobile', String(mobileColumns(count)));
+      grid.style.setProperty('--cols-tablet', String(balancedColumns(count, 3)));
+      grid.style.setProperty('--cols-desktop', String(balancedColumns(count, 4)));
+      cards.forEach(function (card, index) {
+        card.style.setProperty('--card-index', String(index));
+      });
+    }
+
+    function syncAllGrids() { menuGrids.forEach(syncGrid); }
+
+    menuGrids.forEach(function (grid) {
+      const observer = new MutationObserver(function () { syncGrid(grid); });
+      observer.observe(grid, { childList: true });
+      syncGrid(grid);
+    });
+
+    let gridResizeTimer = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(gridResizeTimer);
+      gridResizeTimer = setTimeout(syncAllGrids, 150);
+    });
+
+    window.toggleAdminSidebar = function () {
+      const panel = document.getElementById('adminPanel');
+      const button = document.querySelector('.admin-menu-btn');
+      if (!panel) return;
+      const open = panel.classList.toggle('sidebar-open');
+      if (button) {
+        button.setAttribute('aria-expanded', String(open));
+        button.setAttribute('aria-label', open ? 'إغلاق القائمة' : 'فتح القائمة');
+      }
+    };
+
+    window.addEventListener('resize', function () {
+      if (window.innerWidth >= 900) {
+        const panel = document.getElementById('adminPanel');
+        const button = document.querySelector('.admin-menu-btn');
+        if (panel) panel.classList.remove('sidebar-open');
+        if (button) {
+          button.setAttribute('aria-expanded', 'false');
+          button.setAttribute('aria-label', 'فتح القائمة');
+        }
+      }
+    });
+  }());
+</script>
 
 </body>
 </html>
