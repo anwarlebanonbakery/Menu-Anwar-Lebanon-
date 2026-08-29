@@ -431,7 +431,7 @@ resetKioskIdleTimer();
 /* ══════════════════════════════════════
    دخول الأدمن — 3 لمسات على اللوجو تفتح لوحة التحكم المنفصلة
 ══════════════════════════════════════ */
-(function setupLogoTapGesture() {
+function setupLogoTapGesture() {
   const logoEl = document.getElementById('logoTapTarget');
   if (!logoEl) return; // element must exist before attaching the listener
 
@@ -471,7 +471,16 @@ resetKioskIdleTimer();
     // Fallback for older browsers without Pointer Events support.
     logoEl.addEventListener('click', registerLogoTap);
   }
-})();
+}
+
+// The logo element may not exist yet if this script runs before the DOM
+// has finished parsing (e.g. loaded in <head> without 'defer'). Wait for
+// DOMContentLoaded in that case; otherwise attach right away.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupLogoTapGesture);
+} else {
+  setupLogoTapGesture();
+}
 
 /* ══════════════════════════════════════
    البداية
