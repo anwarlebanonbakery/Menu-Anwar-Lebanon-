@@ -2313,6 +2313,30 @@ img { -webkit-user-drag: none; }
 
 <div class="conn-status-dot" id="connStatusDot" title="حالة الاتصال"></div>
 
+<!-- ══════════════════════════════════════
+     FIX: window.openAdminOverlay must exist BEFORE kiosk-app.js runs.
+     Module scripts (type="module") are deferred and execute in document
+     order only AFTER the HTML has finished parsing — so the old approach
+     (defining window.openAdminOverlay inside the *last* module script)
+     meant kiosk-app.js's 3-tap check could run before that assignment
+     ever happened (or never happen at all if a Firebase import failed).
+     This plain, non-module <script> executes immediately, synchronously,
+     during parsing — guaranteeing it exists by the time any tap gesture
+     fires, regardless of module load order or network conditions.
+     There is exactly ONE definition of window.openAdminOverlay in the
+     whole file (this one) — the admin module script below only closes
+     the overlay, it no longer redefines it.
+══════════════════════════════════════ -->
+<script>
+  window.KIOSK_VIEWPORT = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+  window.openAdminOverlay = function () {
+    document.getElementById('adminOverlay').classList.add('show');
+    var scale = Math.min(1, (window.innerWidth || 1180) / 1180);
+    document.querySelector('meta[name="viewport"]').setAttribute(
+      'content', 'width=1180, initial-scale=' + scale + ', user-scalable=yes'
+    );
+  };
+</script>
 <script type="module" src="./firebase-app.js"></script>
 <script type="module" src="./kiosk-app.js"></script>
 <script type="module">
@@ -2323,20 +2347,12 @@ import {
 } from "./firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-/* ── فتح/قفل أوفرلاي الأدمن — بيفرض عرض ديسك توب حتى على الموبايل ── */
-const KIOSK_VIEWPORT = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
-const ADMIN_VIEWPORT = "width=1180, initial-scale=0.32, user-scalable=yes";
-function fitAdminViewport() {
-  const scale = Math.min(1, (window.innerWidth || 1180) / 1180);
-  document.querySelector('meta[name="viewport"]').setAttribute('content', `width=1180, initial-scale=${scale}, user-scalable=yes`);
-}
-window.openAdminOverlay = function () {
-  document.getElementById('adminOverlay').classList.add('show');
-  fitAdminViewport();
-};
+/* ── قفل أوفرلاي الأدمن ──
+   window.openAdminOverlay بقى معرّف مسبقًا في سكريبت مستقل فوق (قبل تحميل
+   الموديولز) عشان يضمن إنه موجود وقت الحاجة له بدون أي مشاكل ترتيب تحميل. */
 function closeAdminOverlay() {
   document.getElementById('adminOverlay').classList.remove('show');
-  document.querySelector('meta[name="viewport"]').setAttribute('content', KIOSK_VIEWPORT);
+  document.querySelector('meta[name="viewport"]').setAttribute('content', window.KIOSK_VIEWPORT);
   adminLogout();
 }
 document.getElementById('adminOverlayClose').addEventListener('click', closeAdminOverlay);
@@ -2665,29 +2681,4 @@ function openCategoryDrawer(id) {
   $('#drawerSave').onclick = async () => {
     const name = $('#dName').value.trim();
     if (!name) { showToast('⚠️ حطي اسم القسم'); return; }
-    const cleanSections = pendingSections.filter(s => s.name.trim()).map(s => ({ id: s.id, name: s.name.trim() }));
-    $('#drawerSave').textContent = 'جاري الحفظ...';
-    try {
-      let imageUrl = cat ? cat.imageUrl : '';
-      if (pendingImageFile) {
-        const { url } = await uploadMenuImage(pendingImageFile);
-        imageUrl = url;
-      }
-      const data = { name, imageUrl, visible: $('#dVisible').checked, sections: cleanSections };
-      if (cat) await updateCategory(cat.id, data);
-      else await createCategory({ ...data, displayType: 'category', menuImageUrl: '', displayOrder: liveState.categories.length });
-      showToast('✅ اتحفظ');
-      closeDrawer();
-      await refreshAndRerender();
-    } catch (err) {
-      showToast('⚠️ حصل خطأ، حاولي تاني');
-    } finally {
-      $('#drawerSave').textContent = 'حفظ';
-    }
-  };
-}
-
-function openProductDrawer(id) {
-  const item = id ? allProductsFlat().find(p => p.id === id) : null;
-  pendingImageFile = null;
-  const catOptions = liveState.categories.m
+    const cleanSections = pendingSections.filter(s => s.name.trim()).
