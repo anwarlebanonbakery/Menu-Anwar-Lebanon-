@@ -117,11 +117,11 @@ function renderHomeGrid() {
 function buildPriceHTML(item) {
   if (item.sizePrices && item.sizePrices.length) {
     return `<div class="prod-sizeprice-row">${item.sizePrices.map(s =>
-      `<span class="prod-sizeprice-chip"><span class="sz-name">${s.name}</span><span class="sz-val">${s.price}</span></span>`
+      `<span class="prod-sizeprice-chip"><span class="sz-name">${s.name}</span><span class="sz-val">${s.price} <span class="prod-currency">AED</span></span></span>`
     ).join('')}</div>`;
   }
   if (item.price !== undefined && item.price !== null)
-    return `<div class="prod-price"><span class="prod-currency">AED </span>${item.price}</div>`;
+    return `<div class="prod-price">${item.price}<span class="prod-currency">AED</span></div>`;
   return `<div class="prod-price dash">—</div>`;
 }
 function buildBadgeHTML(item) {
@@ -130,7 +130,7 @@ function buildBadgeHTML(item) {
     return '';
   }
   if (item.price !== undefined && item.price !== null)
-    return `<div class="prod-badge">${item.price} AED</div>`;
+    return `<div class="prod-badge">${item.price} <span class="badge-currency">AED</span></div>`;
   return `<div class="prod-badge no-price">—</div>`;
 }
 
@@ -311,14 +311,14 @@ function openProduct(id) {
 
   document.getElementById('pd-name').textContent = item.name;
   const hasSizePrices = item.sizePrices && item.sizePrices.length;
-  document.getElementById('pd-price').textContent = hasSizePrices
-    ? item.sizePrices.map(s => `${s.name} ${s.price}`).join(' / ') + ' AED'
-    : ((item.price !== undefined && item.price !== null) ? `${item.price} AED` : '—');
+  document.getElementById('pd-price').innerHTML = hasSizePrices
+    ? `${item.sizePrices.map(s => `${s.name} ${s.price}`).join(' / ')} <span class="prod-currency">AED</span>`
+    : ((item.price !== undefined && item.price !== null) ? `${item.price}<span class="prod-currency">AED</span>` : '—');
 
   const sizePricesBlock = document.getElementById('pd-sizeprices-block');
   if (hasSizePrices) {
     document.getElementById('pd-sizeprices-list').innerHTML = item.sizePrices.map(s =>
-      `<div class="pd-sizeprice-row"><span class="pd-sizeprice-name">${s.name}</span><span class="pd-sizeprice-value">${s.price} AED</span></div>`
+      `<div class="pd-sizeprice-row"><span class="pd-sizeprice-name">${s.name}</span><span class="pd-sizeprice-value">${s.price} <span class="prod-currency">AED</span></span></div>`
     ).join('');
     sizePricesBlock.style.display = 'block';
   } else {
