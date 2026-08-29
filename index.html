@@ -591,6 +591,36 @@ img { -webkit-user-drag: none; }
 .manaesh-types { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
 .manaesh-chip { background: var(--cream); border: 1px solid var(--cream-d); color: var(--m-brown-m); font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 10px; white-space: nowrap; }
 
+/* ══════════════════════════════════════
+   الأقسام الفرعية — شريط تابز ثابت + سكشنز جوا نفس صفحة القسم
+══════════════════════════════════════ */
+.products-wrap { background: var(--cream); }
+.section-tabs-bar {
+  position: sticky; top: 65px; z-index: 190;
+  background: var(--white); border-bottom: 1px solid var(--border);
+  display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  padding: 10px 14px; box-shadow: 0 2px 10px rgba(58,26,5,0.05);
+}
+.section-tabs-bar::-webkit-scrollbar { display: none; }
+.section-tab {
+  flex-shrink: 0; white-space: nowrap; cursor: pointer;
+  font-family: 'Tajawal', sans-serif; font-size: 12.5px; font-weight: 700;
+  color: var(--m-brown-m); background: var(--cream-d); border: 1.5px solid transparent;
+  padding: 8px 16px; border-radius: 20px; transition: background .2s, color .2s, border-color .2s, transform .2s;
+}
+.section-tab:active { transform: scale(0.96); }
+.section-tab.active {
+  background: linear-gradient(135deg, var(--orange), var(--orange-d));
+  color: var(--white); border-color: transparent;
+  box-shadow: 0 4px 12px rgba(230,57,70,0.28);
+}
+.section-block { scroll-margin-top: 112px; padding-top: 4px; }
+.section-block-title {
+  font-family: 'Cairo', sans-serif; font-size: 15.5px; font-weight: 800;
+  color: var(--m-brown); padding: 18px 14px 4px; max-width: 600px; margin: 0 auto; width: 100%;
+}
+.section-block:first-child .section-block-title { padding-top: 14px; }
+
 @media(max-width:400px) {
   .home-grid { gap: 12px; padding: 14px 12px 8px; }
   .menu-hero { max-height: 260px; }
@@ -662,6 +692,13 @@ img { -webkit-user-drag: none; }
 .pd-nutri-value { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 15px; color: var(--m-brown); }
 .pd-nutri-label { font-size: 10.5px; color: var(--m-brown-l); margin-top: 2px; }
 .pd-desc { font-size: 13.5px; color: var(--m-brown-m); line-height: 1.7; margin-top: 4px; }
+.pd-sizeprices-list { display: flex; flex-direction: column; gap: 8px; }
+.pd-sizeprice-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--cream); border-radius: 12px; padding: 10px 14px;
+}
+.pd-sizeprice-name { font-size: 13px; font-weight: 700; color: var(--m-brown); }
+.pd-sizeprice-value { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 14px; color: var(--green); }
 .pd-chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 
 /* ══════════════════════════════════════
@@ -1856,6 +1893,8 @@ img { -webkit-user-drag: none; }
     padding: 22px 24px 50px;
   }
   .prod-card.tall { grid-column: auto; grid-row: auto; }
+  .section-tabs-bar { padding: 12px 24px; }
+  .section-block-title { max-width: 820px; padding: 20px 24px 4px; font-size: 17px; }
 }
 
 /* ══════════════════════════════════════
@@ -1889,6 +1928,9 @@ img { -webkit-user-drag: none; }
     padding: 34px 44px 70px;
   }
   .prod-card.tall { grid-column: auto; }
+  .section-tabs-bar { padding: 14px 44px; top: 74px; }
+  .section-block-title { max-width: 1180px; padding: 24px 44px 6px; }
+  .section-block { scroll-margin-top: 130px; }
 }
 
 /* شاشات ديسك توب واسعة فعلاً (مش تابلت) — نفس المنطق، حدود أعمدة أعرض شوية */
@@ -2145,7 +2187,7 @@ img { -webkit-user-drag: none; }
         <span class="banner-tag" id="inner-tag"></span>
       </div>
     </div>
-    <div class="products-grid" id="products-grid"></div>
+    <div class="products-wrap" id="products-grid"></div>
   </div>
 
   <div class="menu-view" id="view-image">
@@ -2176,6 +2218,10 @@ img { -webkit-user-drag: none; }
         <div class="pd-rating"><span class="stars" id="pd-stars"></span><span id="pd-rating-num"></span></div>
       </div>
       <div id="pd-chips"></div>
+      <div id="pd-sizeprices-block" style="display:none;">
+        <div class="pd-section-label">الأحجام والأسعار</div>
+        <div class="pd-sizeprices-list" id="pd-sizeprices-list"></div>
+      </div>
       <div id="pd-nutrition-block" style="display:none;">
         <div class="pd-section-label">القيمة الغذائية</div>
         <div class="pd-nutrition-grid" id="pd-nutrition-grid"></div>
@@ -2425,7 +2471,7 @@ function renderCategoriesTable() {
           ${cats.map(c => `
             <tr class="row">
               <td><div class="cell-name"><img class="cell-thumb" src="${c.imageUrl}" alt=""/><div class="n">${escAttr(c.name)}</div></div></td>
-              <td>${c.displayType === 'image' ? 'صورة منيو' : 'قسم أصناف'}</td>
+              <td>${c.displayType === 'image' ? 'صورة منيو' : (c.sections && c.sections.length ? `قسم أصناف (${c.sections.length} قسم فرعي)` : 'قسم أصناف')}</td>
               <td>${(liveState.products[c.id] || []).length} صنف</td>
               <td><span class="badge ${c.visible ? 'on' : 'off'}">${c.visible ? 'ظاهر' : 'مخفي'}</span></td>
               <td>
@@ -2438,6 +2484,16 @@ function renderCategoriesTable() {
         </tbody>
       </table>
     </div>`;
+}
+
+function catSubLabel(p) {
+  const cat = liveState.categories.find(c => c.id === p.categoryId);
+  if (!cat) return '';
+  if (p.sectionId && cat.sections) {
+    const sec = cat.sections.find(s => s.id === p.sectionId);
+    if (sec) return `${cat.name} ← ${sec.name}`;
+  }
+  return cat.name || '';
 }
 
 function renderProductsTable() {
@@ -2461,8 +2517,10 @@ function renderProductsTable() {
         <tbody>
           ${products.map(p => `
             <tr class="row">
-              <td><div class="cell-name"><img class="cell-thumb" src="${p.imageUrl}" alt=""/><div><div class="n">${escAttr(p.name)}</div><div class="s">${escAttr((liveState.categories.find(c=>c.id===p.categoryId)||{}).name || '')}</div></div></div></td>
-              <td>${p.price != null ? `<span class="price-tag">${p.price} AED</span>` : `<span class="price-tag na">—</span>`}</td>
+              <td><div class="cell-name"><img class="cell-thumb" src="${p.imageUrl}" alt=""/><div><div class="n">${escAttr(p.name)}</div><div class="s">${escAttr(catSubLabel(p))}</div></div></div></td>
+              <td>${p.sizePrices && p.sizePrices.length
+                  ? `<span class="price-tag">${p.sizePrices.map(s => `${escAttr(s.name)}: ${s.price}`).join(' / ')}</span>`
+                  : (p.price != null ? `<span class="price-tag">${p.price} AED</span>` : `<span class="price-tag na">—</span>`)}</td>
               <td>${p.rating != null ? `⭐ ${p.rating}` : '—'}</td>
               <td><span class="badge ${p.visible ? 'on' : 'off'}">${p.visible ? 'ظاهر' : 'مخفي'}</span></td>
               <td>
@@ -2523,9 +2581,15 @@ function openDrawer(title) { $('#drawerTitle').textContent = title; backdrop.cla
 
 let pendingImageFile = null;
 
+/* ── توليد معرف بسيط للأقسام الفرعية/أحجام الأسعار ── */
+function makeLocalId() {
+  return 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
 function openCategoryDrawer(id) {
   const cat = id ? liveState.categories.find(c => c.id === id) : null;
   pendingImageFile = null;
+  let pendingSections = cat && cat.sections ? cat.sections.map(s => ({ ...s })) : [];
   openDrawer(cat ? 'تعديل القسم' : 'قسم جديد');
   $('#drawerBody').innerHTML = `
     <div class="field">
@@ -2539,7 +2603,47 @@ function openCategoryDrawer(id) {
     <div class="toggle-field field">
       <span style="font-size:13px;font-weight:700;color:var(--text-mid);">ظاهر في المنيو</span>
       <label class="toggle"><input type="checkbox" id="dVisible" ${cat ? (cat.visible ? 'checked':'') : 'checked'}/><span class="track"></span></label>
+    </div>
+    <div class="field">
+      <label>أقسام فرعية (اختياري)</label>
+      <div class="field-hint" style="margin:-2px 0 10px;">لو القسم كبير وعايز تقسمه لأقسام جوا بعض (زي: فطاير أجبان، فطاير لحوم...)، ضيفهم هنا. لما يكون فيه أقسام فرعية، هيظهر شريط تابز في صفحة القسم في الموقع.</div>
+      <div id="sectionsList"></div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <input id="newSectionName" placeholder="اسم القسم الفرعي..."
+          style="flex:1; padding:11px 13px; border:1.5px solid var(--line); border-radius:10px; font-size:13.5px; background:#FBFAF7;"/>
+        <button class="btn ghost sm" id="addSectionBtn" type="button">+ إضافة</button>
+      </div>
     </div>`;
+
+  function renderSectionsList() {
+    const list = $('#sectionsList');
+    if (!pendingSections.length) {
+      list.innerHTML = `<div class="field-hint">مفيش أقسام فرعية دلوقتي</div>`;
+      return;
+    }
+    list.innerHTML = pendingSections.map((s, i) => `
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <input data-idx="${i}" class="sec-name-input" value="${escAttr(s.name)}"
+          style="flex:1; padding:11px 13px; border:1.5px solid var(--line); border-radius:10px; font-size:13.5px; background:#FBFAF7;"/>
+        <button class="icon-btn del sec-remove-btn" data-idx="${i}" type="button">🗑</button>
+      </div>`).join('');
+    list.querySelectorAll('.sec-name-input').forEach(inp => {
+      inp.addEventListener('input', (e) => { pendingSections[+e.target.dataset.idx].name = e.target.value; });
+    });
+    list.querySelectorAll('.sec-remove-btn').forEach(btn => {
+      btn.addEventListener('click', () => { pendingSections.splice(+btn.dataset.idx, 1); renderSectionsList(); });
+    });
+  }
+  renderSectionsList();
+
+  $('#addSectionBtn').addEventListener('click', () => {
+    const name = $('#newSectionName').value.trim();
+    if (!name) { showToast('⚠️ حطي اسم القسم الفرعي الأول'); return; }
+    pendingSections.push({ id: makeLocalId(), name });
+    $('#newSectionName').value = '';
+    renderSectionsList();
+  });
+
   $('#dImgInput').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -2550,6 +2654,7 @@ function openCategoryDrawer(id) {
   $('#drawerSave').onclick = async () => {
     const name = $('#dName').value.trim();
     if (!name) { showToast('⚠️ حطي اسم القسم'); return; }
+    const cleanSections = pendingSections.filter(s => s.name.trim()).map(s => ({ id: s.id, name: s.name.trim() }));
     $('#drawerSave').textContent = 'جاري الحفظ...';
     try {
       let imageUrl = cat ? cat.imageUrl : '';
@@ -2557,7 +2662,7 @@ function openCategoryDrawer(id) {
         const { url } = await uploadMenuImage(pendingImageFile);
         imageUrl = url;
       }
-      const data = { name, imageUrl, visible: $('#dVisible').checked };
+      const data = { name, imageUrl, visible: $('#dVisible').checked, sections: cleanSections };
       if (cat) await updateCategory(cat.id, data);
       else await createCategory({ ...data, displayType: 'category', menuImageUrl: '', displayOrder: liveState.categories.length });
       showToast('✅ اتحفظ');
@@ -2575,77 +2680,16 @@ function openProductDrawer(id) {
   const item = id ? allProductsFlat().find(p => p.id === id) : null;
   pendingImageFile = null;
   const catOptions = liveState.categories.map(c => `<option value="${c.id}" ${item && item.categoryId===c.id ? 'selected':''}>${escAttr(c.name)}</option>`).join('');
+
+  // أسعار: إما سعر واحد قديم أو أحجام متعددة (وسط/كبير...)
+  let pendingSizePrices = item && item.sizePrices && item.sizePrices.length
+    ? item.sizePrices.map(s => ({ ...s }))
+    : (item && item.price != null ? [{ name: 'السعر', price: item.price }] : [{ name: 'وسط', price: null }, { name: 'كبير', price: null }]);
+
   openDrawer(item ? 'تعديل الصنف' : 'صنف جديد');
   $('#drawerBody').innerHTML = `
     <div class="field">
       <label>صورة الصنف</label>
       <div class="img-upload">
         <img id="dImgPreview" src="${item ? item.imageUrl : ''}" alt=""/>
-        <label>📷 اختاري صورة<input type="file" id="dImgInput" accept="image/*" style="display:none;"/></label>
-      </div>
-    </div>
-    <div class="field"><label>القسم</label><select id="dCat" style="width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:13.5px;background:#FBFAF7;">${catOptions}</select></div>
-    <div class="field"><label>اسم الصنف</label><input id="dName" value="${escAttr(item?.name || '')}"/></div>
-    <div class="field-row">
-      <div class="field"><label>السعر (AED)</label><input id="dPrice" type="number" value="${item?.price ?? ''}"/></div>
-      <div class="field"><label>التقييم (0-5)</label><input id="dRating" type="number" min="0" max="5" step="0.1" value="${item?.rating ?? ''}"/></div>
-    </div>
-    <div class="field"><label>الوصف</label><textarea id="dDesc" rows="3">${escAttr(item?.description || '')}</textarea></div>
-    <div class="field">
-      <label>القيمة الغذائية</label>
-      <div class="field-row">
-        <input id="dCal" type="number" placeholder="سعرات" value="${item?.nutrition?.calories ?? ''}"/>
-        <input id="dProt" type="number" placeholder="بروتين g" value="${item?.nutrition?.protein ?? ''}"/>
-        <input id="dFat" type="number" placeholder="دهون g" value="${item?.nutrition?.fat ?? ''}"/>
-        <input id="dCarb" type="number" placeholder="كارب g" value="${item?.nutrition?.carb ?? ''}"/>
-      </div>
-      <div class="field-hint">سيبيها فاضية لو مش هتظهر في صفحة الصنف</div>
-    </div>
-    <div class="toggle-field field">
-      <span style="font-size:13px;font-weight:700;color:var(--text-mid);">ظاهر في المنيو</span>
-      <label class="toggle"><input type="checkbox" id="dVisible" ${item ? (item.visible?'checked':'') : 'checked'}/><span class="track"></span></label>
-    </div>`;
-  $('#dImgInput').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    pendingImageFile = file;
-    $('#dImgPreview').src = URL.createObjectURL(file);
-  });
-
-  $('#drawerSave').onclick = async () => {
-    const name = $('#dName').value.trim();
-    const categoryId = $('#dCat').value;
-    if (!name) { showToast('⚠️ حطي اسم الصنف'); return; }
-    if (!categoryId) { showToast('⚠️ اختاري قسم'); return; }
-    $('#drawerSave').textContent = 'جاري الحفظ...';
-    try {
-      let imageUrl = item ? item.imageUrl : '';
-      if (pendingImageFile) {
-        const { url } = await uploadMenuImage(pendingImageFile);
-        imageUrl = url;
-      }
-      const num = (v) => v === '' ? null : Number(v);
-      const data = {
-        name, categoryId, imageUrl,
-        price: num($('#dPrice').value),
-        rating: num($('#dRating').value),
-        description: $('#dDesc').value.trim(),
-        nutrition: { calories: num($('#dCal').value), protein: num($('#dProt').value), fat: num($('#dFat').value), carb: num($('#dCarb').value) },
-        visible: $('#dVisible').checked,
-      };
-      if (item) await updateProduct(item.id, data);
-      else await createProduct({ ...data, sizes: [], flavors: [], manaeshTypes: [], wide: false, tall: false, displayOrder: (liveState.products[categoryId]||[]).length });
-      showToast('✅ اتحفظ');
-      closeDrawer();
-      await refreshAndRerender();
-    } catch (err) {
-      showToast('⚠️ حصل خطأ، حاولي تاني');
-    } finally {
-      $('#drawerSave').textContent = 'حفظ';
-    }
-  };
-}
-</script>
-
-</body>
-</html>
+        <label>📷 اختاري صورة<input type
