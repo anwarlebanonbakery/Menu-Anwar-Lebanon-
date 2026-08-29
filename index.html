@@ -574,6 +574,7 @@ img { -webkit-user-drag: none; }
   box-shadow: 0 3px 10px rgba(31,122,77,0.35);
 }
 .prod-badge.no-price { background: linear-gradient(135deg, #999, #bbb); }
+.prod-badge .badge-currency { font-size: 9.5px; font-weight: 700; opacity: 0.85; }
 .prod-card { cursor: pointer; }
 .prod-body { padding: 10px 11px 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
 .prod-name { font-size: 13.5px; font-weight: 700; color: var(--m-brown); line-height: 1.35; margin-bottom: 6px; }
@@ -582,10 +583,19 @@ img { -webkit-user-drag: none; }
 .prod-flavor-chip { background: var(--cream); border: 1px solid var(--cream-d); color: var(--m-brown-m); font-size: 10.5px; padding: 2px 7px; border-radius: 8px; }
 .prod-sizes { display: flex; gap: 5px; margin-bottom: 6px; }
 .prod-size-chip { background: linear-gradient(135deg, var(--orange-d), var(--orange)); color: white; font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 10px; }
-.prod-price-row { display: flex; align-items: center; justify-content: space-between; }
-.prod-price { font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 900; color: var(--green); }
+.prod-price-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.prod-price { font-family: 'Cairo', sans-serif; font-size: 16px; font-weight: 900; color: var(--green-d); display: inline-flex; align-items: baseline; gap: 3px; }
 .prod-price.dash { color: #bbb; font-size: 18px; letter-spacing: 1px; }
-.prod-currency { font-size: 10px; font-weight: 600; color: var(--m-brown-l); margin-right: 2px; }
+.prod-currency { font-size: 10px; font-weight: 700; color: var(--m-brown-l); letter-spacing: 0.3px; }
+
+/* أسعار الأحجام المتعددة (وسط/كبير...) داخل كارت الصنف */
+.prod-sizeprice-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.prod-sizeprice-chip {
+  display: inline-flex; align-items: baseline; gap: 4px;
+  background: var(--green-pastel); border-radius: 10px; padding: 4px 8px 4px 9px;
+}
+.prod-sizeprice-chip .sz-name { font-size: 10px; font-weight: 700; color: var(--m-brown-l); }
+.prod-sizeprice-chip .sz-val { font-family: 'Cairo', sans-serif; font-size: 12.5px; font-weight: 900; color: var(--green-d); }
 .prod-heart { width: 28px; height: 28px; border-radius: 50%; background: var(--cream); border: 1px solid var(--cream-d); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: transform .2s; }
 .prod-heart:hover { transform: scale(1.2); }
 .manaesh-types { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
@@ -679,7 +689,8 @@ img { -webkit-user-drag: none; }
 }
 .pd-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .pd-name { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 20px; color: var(--m-brown); line-height: 1.3; }
-.pd-price { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 20px; color: var(--green); white-space: nowrap; }
+.pd-price { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 20px; color: var(--green-d); white-space: nowrap; display: inline-flex; align-items: baseline; gap: 4px; }
+.pd-price .prod-currency { font-size: 12px; }
 .pd-meta-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
 .pd-rating { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--m-brown-m); }
 .pd-rating .stars { color: var(--star); letter-spacing: 1px; }
@@ -698,7 +709,8 @@ img { -webkit-user-drag: none; }
   background: var(--cream); border-radius: 12px; padding: 10px 14px;
 }
 .pd-sizeprice-name { font-size: 13px; font-weight: 700; color: var(--m-brown); }
-.pd-sizeprice-value { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 14px; color: var(--green); }
+.pd-sizeprice-value { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 14.5px; color: var(--green-d); display: inline-flex; align-items: baseline; gap: 4px; }
+.pd-sizeprice-value .prod-currency { font-size: 10px; }
 .pd-chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 
 /* ══════════════════════════════════════
@@ -2676,20 +2688,4 @@ function openCategoryDrawer(id) {
   };
 }
 
-function openProductDrawer(id) {
-  const item = id ? allProductsFlat().find(p => p.id === id) : null;
-  pendingImageFile = null;
-  const catOptions = liveState.categories.map(c => `<option value="${c.id}" ${item && item.categoryId===c.id ? 'selected':''}>${escAttr(c.name)}</option>`).join('');
-
-  // أسعار: إما سعر واحد قديم أو أحجام متعددة (وسط/كبير...)
-  let pendingSizePrices = item && item.sizePrices && item.sizePrices.length
-    ? item.sizePrices.map(s => ({ ...s }))
-    : (item && item.price != null ? [{ name: 'السعر', price: item.price }] : [{ name: 'وسط', price: null }, { name: 'كبير', price: null }]);
-
-  openDrawer(item ? 'تعديل الصنف' : 'صنف جديد');
-  $('#drawerBody').innerHTML = `
-    <div class="field">
-      <label>صورة الصنف</label>
-      <div class="img-upload">
-        <img id="dImgPreview" src="${item ? item.imageUrl : ''}" alt=""/>
-        <label>📷 اختاري صورة<input type
+function openProd
