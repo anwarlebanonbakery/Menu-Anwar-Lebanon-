@@ -49,8 +49,10 @@ window.addEventListener('resize', () => {
   gridResizeTimer = setTimeout(() => {
     const homeGrid = document.getElementById('homeGrid');
     if (homeGrid) fitGridColumns(homeGrid, liveState.categories.length, 230);
-    const prodGrid = document.getElementById('products-grid');
-    if (prodGrid && currentCategoryId) fitGridColumns(prodGrid, (liveState.products[currentCategoryId] || []).length, 220);
+    // في وضع الأقسام الفرعية بيبقى فيه أكتر من grid جوا الصفحة، كل واحد بعدد أصنافه
+    document.querySelectorAll('#products-grid .products-grid').forEach(g => {
+      fitGridColumns(g, g.children.length, 220);
+    });
   }, 200);
 }, { passive: true });
 
@@ -111,18 +113,126 @@ function renderHomeGrid() {
   fitGridColumns(grid, liveState.categories.length, 230);
 }
 
+/* ── أصناف بسعر واحد أو بأحجام (وسط/كبير...) ── */
+function lowestSizePrice(item) {
+  if (!item.sizePrices || !item.sizePrices.length) return null;
+  return item.sizePrices.reduce((min, s) => (s.price != null && (min === null || s.price < min) ? s.price : min), null);
+}
 function buildPriceHTML(item) {
+  if (item.sizePrices && item.sizePrices.length) {
+    const min = lowestSizePrice(item);
+    return `<div class="prod-price"><span class="prod-currency">من </span>${min}<span class="prod-currency"> AED</span></div>`;
+  }
   if (item.price !== undefined && item.price !== null)
     return `<div class="prod-price"><span class="prod-currency">AED </span>${item.price}</div>`;
   return `<div class="prod-price dash">—</div>`;
 }
 function buildBadgeHTML(item) {
+  if (item.sizePrices && item.sizePrices.length) {
+    const min = lowestSizePrice(item);
+    return `<div class="prod-badge">من ${min} AED</div>`;
+  }
   if (item.price !== undefined && item.price !== null)
     return `<div class="prod-badge">${item.price} AED</div>`;
   return `<div class="prod-badge no-price">—</div>`;
 }
 
 let currentCategoryId = null;
+let sectionObserver = null;
+
+/* ── بناء كارت صنف واحد (بيتستخدم في الوضع العادي ووضع الأقسام الفرعية) ── */
+function buildProductCard(item) {
+  const card = document.createElement('div');
+  card.className = 'prod-card' + (item.wide ? ' wide' : '') + (item.tall ? ' tall' : '');
+  card.onclick = () => openProduct(item.id);
+  let extras = '';
+  if (item.sizes && item.sizes.length) extras += `<div class="prod-sizes">${item.sizes.map(s => `<span class="prod-size-chip">${s}</span>`).join('')}</div>`;
+  if (item.flavors && item.flavors.length) extras += `<div class="prod-flavors">${item.flavors.map(f => `<span class="prod-flavor-chip">${f}</span>`).join('')}</div>`;
+  if (item.description) extras += `<div class="prod-note">${item.description}</div>`;
+  let manaesh = '';
+  if (item.manaeshTypes && item.manaeshTypes.length) manaesh = `<div class="manaesh-types">${item.manaeshTypes.map(t => `<span class="manaesh-chip">${t}</span>`).join('')}</div>`;
+  card.innerHTML = `
+    <div class="prod-img-wrap">
+      <img class="prod-img" src="${item.imageUrl}" alt="${item.name}" loading="lazy" decoding="async"/>
+      ${buildBadgeHTML(item)}
+    </div>
+    <div class="prod-body">
+      <div>
+        <div class="prod-name">${item.name}</div>
+        ${extras}${manaesh}
+      </div>
+      <div class="prod-price-row">
+        ${buildPriceHTML(item)}
+        <div class="prod-heart">🤍</div>
+      </div>
+    </div>`;
+  return card;
+}
+
+/* ── تعمير شبكة أصناف واحدة داخل حاوية معينة ── */
+function fillProductsGrid(grid, items) {
+  grid.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  items.forEach(item => frag.appendChild(buildProductCard(item)));
+  grid.appendChild(frag);
+  grid.querySelectorAll('.prod-img').forEach(img => setupImageLoading(img, fallbackImg));
+  fitGridColumns(grid, items.length, 220);
+  const cards = grid.querySelectorAll('.prod-card');
+  cards.forEach((c, i) => { c.style.transitionDelay = (Math.min(i, 10) * 50) + 'ms'; });
+  requestAnimationFrame(() => requestAnimationFrame(() => cards.forEach(c => c.classList.add('show'))));
+}
+
+/* ── وضع الأقسام الفرعية: شريط تابز ثابت + سكرول خفيف لكل سكشن ── */
+function renderSectionedCategory(wrap, cat, items) {
+  const sections = cat.sections || [];
+  const bySection = {};
+  sections.forEach(s => { bySection[s.id] = []; });
+  const others = [];
+  items.forEach(item => {
+    if (item.sectionId && bySection[item.sectionId]) bySection[item.sectionId].push(item);
+    else others.push(item);
+  });
+  const allSections = others.length ? [...sections, { id: '__other', name: 'أصناف أخرى' }] : sections;
+  if (others.length) bySection.__other = others;
+
+  wrap.classList.remove('products-grid');
+  wrap.classList.add('products-wrap');
+  wrap.innerHTML = `
+    <div class="section-tabs-bar" id="sectionTabsBar">
+      ${allSections.map((s, i) => `<button class="section-tab${i === 0 ? ' active' : ''}" data-section="${s.id}">${s.name}</button>`).join('')}
+    </div>
+    ${allSections.map(s => `
+      <div class="section-block" id="sec-${s.id}">
+        <div class="section-block-title">${s.name}</div>
+        <div class="products-grid" data-section="${s.id}"></div>
+      </div>`).join('')}
+  `;
+
+  allSections.forEach(s => {
+    const grid = wrap.querySelector(`.products-grid[data-section="${s.id}"]`);
+    fillProductsGrid(grid, bySection[s.id] || []);
+  });
+
+  const tabsBar = wrap.querySelector('#sectionTabsBar');
+  tabsBar.querySelectorAll('.section-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = document.getElementById('sec-' + tab.dataset.section);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  if (sectionObserver) sectionObserver.disconnect();
+  sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const id = entry.target.id.replace('sec-', '');
+      tabsBar.querySelectorAll('.section-tab').forEach(t => t.classList.toggle('active', t.dataset.section === id));
+      const activeTab = tabsBar.querySelector('.section-tab.active');
+      if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    });
+  }, { rootMargin: '-160px 0px -65% 0px', threshold: 0 });
+  wrap.querySelectorAll('.section-block').forEach(block => sectionObserver.observe(block));
+}
 
 function openCategory(catId) {
   const cat = liveState.categories.find(c => c.id === catId);
@@ -137,44 +247,18 @@ function openCategory(catId) {
   setupImageLoading(bannerImg, fallbackImg);
   document.getElementById('inner-tag').textContent = cat.tag || '';
 
-  const grid = document.getElementById('products-grid');
-  grid.innerHTML = '';
+  const wrap = document.getElementById('products-grid');
   const items = (liveState.products[catId] || []);
-  const frag = document.createDocumentFragment();
-  items.forEach(item => {
-    const card = document.createElement('div');
-    card.className = 'prod-card' + (item.wide ? ' wide' : '') + (item.tall ? ' tall' : '');
-    card.onclick = () => openProduct(item.id);
-    let extras = '';
-    if (item.sizes && item.sizes.length) extras += `<div class="prod-sizes">${item.sizes.map(s => `<span class="prod-size-chip">${s}</span>`).join('')}</div>`;
-    if (item.flavors && item.flavors.length) extras += `<div class="prod-flavors">${item.flavors.map(f => `<span class="prod-flavor-chip">${f}</span>`).join('')}</div>`;
-    if (item.description) extras += `<div class="prod-note">${item.description}</div>`;
-    let manaesh = '';
-    if (item.manaeshTypes && item.manaeshTypes.length) manaesh = `<div class="manaesh-types">${item.manaeshTypes.map(t => `<span class="manaesh-chip">${t}</span>`).join('')}</div>`;
-    card.innerHTML = `
-      <div class="prod-img-wrap">
-        <img class="prod-img" src="${item.imageUrl}" alt="${item.name}" loading="lazy" decoding="async"/>
-        ${buildBadgeHTML(item)}
-      </div>
-      <div class="prod-body">
-        <div>
-          <div class="prod-name">${item.name}</div>
-          ${extras}${manaesh}
-        </div>
-        <div class="prod-price-row">
-          ${buildPriceHTML(item)}
-          <div class="prod-heart">🤍</div>
-        </div>
-      </div>`;
-    frag.appendChild(card);
-  });
-  grid.appendChild(frag);
-  grid.querySelectorAll('.prod-img').forEach(img => setupImageLoading(img, fallbackImg));
-  fitGridColumns(grid, items.length, 220);
 
-  const cards = grid.querySelectorAll('.prod-card');
-  cards.forEach((c, i) => { c.style.transitionDelay = (Math.min(i, 10) * 50) + 'ms'; });
-  requestAnimationFrame(() => requestAnimationFrame(() => cards.forEach(c => c.classList.add('show'))));
+  if (sectionObserver) { sectionObserver.disconnect(); sectionObserver = null; }
+
+  if (cat.sections && cat.sections.length) {
+    renderSectionedCategory(wrap, cat, items);
+  } else {
+    wrap.classList.remove('products-wrap');
+    wrap.classList.add('products-grid');
+    fillProductsGrid(wrap, items);
+  }
 
   document.getElementById('view-home').classList.remove('active');
   document.getElementById('view-inner').classList.add('active');
@@ -183,6 +267,7 @@ function openCategory(catId) {
 window.openCategory = openCategory;
 
 function goHome() {
+  if (sectionObserver) { sectionObserver.disconnect(); sectionObserver = null; }
   document.getElementById('view-inner').classList.remove('active');
   document.getElementById('view-image').classList.remove('active');
   document.getElementById('view-product').classList.remove('active');
@@ -228,7 +313,20 @@ function openProduct(id) {
   setupImageLoading(heroImg, fallbackImg);
 
   document.getElementById('pd-name').textContent = item.name;
-  document.getElementById('pd-price').textContent = (item.price !== undefined && item.price !== null) ? `${item.price} AED` : '—';
+  const hasSizePrices = item.sizePrices && item.sizePrices.length;
+  document.getElementById('pd-price').textContent = hasSizePrices
+    ? `من ${lowestSizePrice(item)} AED`
+    : ((item.price !== undefined && item.price !== null) ? `${item.price} AED` : '—');
+
+  const sizePricesBlock = document.getElementById('pd-sizeprices-block');
+  if (hasSizePrices) {
+    document.getElementById('pd-sizeprices-list').innerHTML = item.sizePrices.map(s =>
+      `<div class="pd-sizeprice-row"><span class="pd-sizeprice-name">${s.name}</span><span class="pd-sizeprice-value">${s.price} AED</span></div>`
+    ).join('');
+    sizePricesBlock.style.display = 'block';
+  } else {
+    sizePricesBlock.style.display = 'none';
+  }
 
   const ratingRow = document.getElementById('pd-rating-row');
   if (item.rating) {
