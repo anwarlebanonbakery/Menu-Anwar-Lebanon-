@@ -426,22 +426,6 @@ button { font: inherit; }
   .kiosk-brand-text.en { opacity: 0; animation: none; }
 }
 .kiosk-clock { font-family:'Tajawal',sans-serif; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.85); direction: ltr; }
-.kiosk-actions { display: flex; align-items: center; gap: 7px; direction: ltr; }
-.kiosk-action-btn {
-  position: relative; width: 36px; height: 36px; border: 1px solid rgba(255,255,255,.22);
-  border-radius: 50%; background: rgba(255,255,255,.12); color: #fff;
-  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
-  font-size: 16px; transition: transform .18s ease, background .18s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-.kiosk-action-btn:active { transform: scale(.91); }
-.kiosk-action-btn:hover { background: rgba(255,255,255,.22); }
-.action-count {
-  position: absolute; top: -4px; right: -4px; min-width: 17px; height: 17px; padding: 0 4px;
-  border-radius: 20px; background: var(--orange); color: #fff; border: 2px solid var(--green-deep);
-  font-size: 9px; font-weight: 900; line-height: 13px; display: none; align-items: center; justify-content: center;
-}
-.action-count.show { display: flex; }
 
 /* ── Kiosk mode: block gestures that break a fixed in-store display ── */
 html, body {
@@ -465,17 +449,6 @@ img { -webkit-user-drag: none; }
   background: #fff; color: var(--green-deep, #1E4B3E); border: none; border-radius: 40px;
   padding: 16px 40px; font-family:'Tajawal',sans-serif; font-size: 16px; font-weight: 800; cursor: pointer;
 }
-#kioskStartOverlay::before {
-  content: ''; position: absolute; inset: 0; opacity: .24; pointer-events: none;
-  background: url('https://raw.githubusercontent.com/anwarlebanonbakery/bakery-images/main/file_000000000ca481f4984eeedbbedbf2c1.png') center/cover;
-  mix-blend-mode: screen;
-}
-#kioskStartOverlay > * { position: relative; z-index: 1; }
-#kioskStartOverlay .kiosk-start-kicker {
-  font-family:'Cormorant Garamond',serif; font-size: 12px; letter-spacing: 4px;
-  text-transform: uppercase; color: #f5d991; margin-bottom: -10px;
-}
-#kioskStartOverlay .kiosk-start-sub { font-size: 13px; color: rgba(255,255,255,.72); margin-top: -10px; }
 #kioskStartOverlay.hidden { display: none; }
 
 /* ── Admin access gear ── */
@@ -553,27 +526,6 @@ img { -webkit-user-drag: none; }
 .inner-back-btn:hover { background: var(--green-light); }
 .inner-title { font-family: 'Cairo', sans-serif; font-size: 19px; font-weight: 800; color: var(--m-brown); flex: 1; }
 .inner-emoji { font-size: 22px; }
-.inner-actions { display: flex; align-items: center; gap: 6px; margin-right: auto; }
-.inner-action-btn {
-  position: relative; width: 35px; height: 35px; border: 1px solid var(--cream-d); border-radius: 50%;
-  background: var(--cream); color: var(--m-brown); display: inline-flex; align-items: center;
-  justify-content: center; cursor: pointer; font-size: 15px; -webkit-tap-highlight-color: transparent;
-}
-.inner-action-btn:active { transform: scale(.92); }
-.inner-action-btn .action-count { border-color: var(--white); top: -4px; right: -4px; color: #fff; }
-
-.category-quick-nav {
-  position: sticky; top: 66px; z-index: 190; display: flex; gap: 7px; overflow-x: auto;
-  padding: 9px 14px; background: rgba(255,255,255,.96); border-bottom: 1px solid rgba(43,21,6,.07);
-  box-shadow: 0 3px 12px rgba(58,26,5,.04); scrollbar-width: none; -ms-overflow-style: none;
-}
-.category-quick-nav::-webkit-scrollbar { display: none; }
-.category-chip {
-  flex: 0 0 auto; border: 1px solid var(--cream-d); background: var(--cream); color: var(--m-brown-m);
-  padding: 7px 13px; border-radius: 30px; font-family:'Tajawal',sans-serif; font-size: 11.5px;
-  font-weight: 800; cursor: pointer; white-space: nowrap; transition: .18s ease;
-}
-.category-chip.active { color: #fff; border-color: var(--green); background: var(--green-deep-grad); box-shadow: 0 4px 10px rgba(13,54,34,.16); }
 
 .inner-banner-wrap { position: relative; overflow: hidden; height: 165px; background: var(--cream-d); }
 .inner-banner { width: 100%; height: 165px; object-fit: cover; display: block; }
@@ -621,13 +573,8 @@ img { -webkit-user-drag: none; }
   font-size: 12px; font-weight: 900; padding: 4px 9px; border-radius: 20px;
   box-shadow: 0 3px 10px rgba(31,122,77,0.35);
 }
-.prod-featured-badge {
-  position: absolute; top: 9px; right: 9px; z-index: 2; display: inline-flex; align-items: center; gap: 4px;
-  background: rgba(255,255,255,.92); color: var(--green-d); border: 1px solid rgba(31,122,77,.2);
-  padding: 5px 9px; border-radius: 20px; font-family:'Cairo',sans-serif; font-size: 10px; font-weight: 900;
-  box-shadow: 0 4px 12px rgba(13,54,34,.14); backdrop-filter: blur(5px);
-}
 .prod-badge.no-price { background: linear-gradient(135deg, #999, #bbb); }
+.prod-badge .badge-currency { font-size: 9.5px; font-weight: 700; opacity: 0.85; }
 .prod-card { cursor: pointer; }
 .prod-body { padding: 10px 11px 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
 .prod-name { font-size: 13.5px; font-weight: 700; color: var(--m-brown); line-height: 1.35; margin-bottom: 6px; }
@@ -636,65 +583,52 @@ img { -webkit-user-drag: none; }
 .prod-flavor-chip { background: var(--cream); border: 1px solid var(--cream-d); color: var(--m-brown-m); font-size: 10.5px; padding: 2px 7px; border-radius: 8px; }
 .prod-sizes { display: flex; gap: 5px; margin-bottom: 6px; }
 .prod-size-chip { background: linear-gradient(135deg, var(--orange-d), var(--orange)); color: white; font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 10px; }
-.prod-price-row { display: flex; align-items: center; justify-content: space-between; }
-.prod-price { font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 900; color: var(--green); }
+.prod-price-row { display: flex; align-items: center; }
+.prod-price { font-family: 'Cairo', sans-serif; font-size: 16px; font-weight: 900; color: var(--green-d); display: inline-flex; align-items: baseline; gap: 3px; }
 .prod-price.dash { color: #bbb; font-size: 18px; letter-spacing: 1px; }
-.prod-currency { font-size: 10px; font-weight: 600; color: var(--m-brown-l); margin-right: 2px; }
-.prod-heart { width: 28px; height: 28px; border-radius: 50%; background: var(--cream); border: 1px solid var(--cream-d); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: transform .2s; }
-.prod-heart:hover { transform: scale(1.2); }
+.prod-currency { font-size: 10px; font-weight: 700; color: var(--m-brown-l); letter-spacing: 0.3px; }
+
+/* أسعار الأحجام المتعددة (وسط/كبير...) داخل كارت الصنف — جنب بعض في نفس السطر */
+.prod-sizeprice-row { display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.prod-sizeprice-row::-webkit-scrollbar { display: none; }
+.prod-sizeprice-chip {
+  display: inline-flex; align-items: baseline; gap: 3px; flex-shrink: 0;
+  background: var(--green-pastel); border-radius: 10px; padding: 4px 7px 4px 8px;
+}
+.prod-sizeprice-chip .sz-name { font-size: 9.5px; font-weight: 700; color: var(--m-brown-l); }
+.prod-sizeprice-chip .sz-val { font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 900; color: var(--green-d); white-space: nowrap; }
 .manaesh-types { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
 .manaesh-chip { background: var(--cream); border: 1px solid var(--cream-d); color: var(--m-brown-m); font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 10px; white-space: nowrap; }
-.prod-card:active { transform: scale(.985); }
-.prod-card .prod-heart.active { background: #fff0ee; border-color: rgba(230,57,70,.22); }
-.recent-section { max-width: 600px; margin: 0 auto; padding: 0 14px 38px; background: var(--cream); }
-.recent-head { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 10px; }
-.recent-title { font-family:'Cairo',sans-serif; font-size: 14px; font-weight: 900; color: var(--m-brown); }
-.recent-sub { font-size: 10px; color: var(--brown-l); }
-.recent-row { display: flex; gap: 9px; overflow-x: auto; scrollbar-width: none; }
-.recent-row::-webkit-scrollbar { display: none; }
-.recent-card { flex: 0 0 118px; border: 1px solid var(--border); background: #fff; border-radius: 14px; overflow: hidden; cursor: pointer; box-shadow: 0 3px 12px rgba(58,26,5,.06); }
-.recent-card img { width: 100%; height: 74px; object-fit: cover; display: block; background: var(--cream-d); }
-.recent-card span { display: block; padding: 7px 8px 9px; font-size: 11px; font-weight: 800; color: var(--m-brown); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* ── premium kiosk overlays ── */
-.kiosk-modal { position: fixed; inset: 0; z-index: 500; display: none; align-items: flex-end; justify-content: center; background: rgba(13,18,16,.5); backdrop-filter: blur(5px); padding: 12px; }
-.kiosk-modal.show { display: flex; }
-.kiosk-sheet { width: min(100%, 600px); max-height: min(88vh, 760px); overflow-y: auto; background: #fff; border-radius: 28px; box-shadow: 0 18px 60px rgba(0,0,0,.25); animation: sheetIn .28s cubic-bezier(.22,.9,.32,1); }
-@keyframes sheetIn { from { opacity: 0; transform: translateY(28px) scale(.98); } to { opacity: 1; transform: none; } }
-.sheet-close { position: absolute; top: 13px; left: 13px; z-index: 3; width: 36px; height: 36px; border: none; border-radius: 50%; background: rgba(255,255,255,.9); color: var(--m-brown); font-size: 18px; cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,.14); }
-.preview-media { position: relative; height: 260px; background: #171310; overflow: hidden; cursor: zoom-in; }
-.preview-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.preview-zoom-hint { position: absolute; bottom: 12px; right: 12px; color: #fff; background: rgba(0,0,0,.38); border-radius: 20px; padding: 6px 10px; font-size: 10px; font-weight: 700; }
-.preview-body { padding: 18px 18px 24px; }
-.preview-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.preview-name { font-family:'Cairo',sans-serif; font-size: 21px; font-weight: 900; color: var(--m-brown); line-height: 1.35; }
-.preview-price { font-family:'Cairo',sans-serif; font-size: 18px; font-weight: 900; color: var(--green); white-space: nowrap; }
-.preview-rating { color: var(--star); font-size: 13px; margin-top: 7px; }
-.preview-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 13px; }
-.preview-description { color: var(--m-brown-m); font-size: 13px; line-height: 1.8; margin-top: 15px; }
-.preview-fav-btn { margin-top: 18px; width: 100%; border: 1px solid rgba(230,57,70,.2); background: #fff8f7; color: var(--orange-d); border-radius: 16px; padding: 12px; font-size: 13px; font-weight: 900; cursor: pointer; }
-.preview-fav-btn.active { background: var(--orange); color: #fff; }
-.search-sheet, .favorites-sheet { padding: 18px; }
-.sheet-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.sheet-heading h3 { font-family:'Cairo',sans-serif; font-size: 18px; font-weight: 900; color: var(--m-brown); }
-.sheet-heading button { border: none; background: var(--cream-d); border-radius: 50%; width: 32px; height: 32px; cursor: pointer; }
-.menu-search-box { display: flex; align-items: center; gap: 9px; padding: 11px 13px; border: 1px solid var(--cream-d); border-radius: 15px; background: var(--cream); }
-.menu-search-box input { min-width: 0; flex: 1; border: none; outline: none; background: transparent; font: 600 14px 'Tajawal',sans-serif; color: var(--m-brown); }
-.menu-search-results { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 54vh; overflow-y: auto; }
-.search-result { display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid var(--border); background: #fff; border-radius: 14px; cursor: pointer; text-align: right; }
-.search-result img { width: 52px; height: 52px; border-radius: 11px; object-fit: cover; background: var(--cream-d); }
-.search-result-main { min-width: 0; flex: 1; }
-.search-result-name { color: var(--m-brown); font-size: 13px; font-weight: 900; }
-.search-result-meta { color: var(--brown-l); font-size: 11px; margin-top: 3px; }
-.sheet-empty { color: var(--brown-l); font-size: 13px; text-align: center; padding: 25px 8px; }
-.zoom-modal { position: fixed; inset: 0; z-index: 800; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,.9); }
-.zoom-modal.show { display: flex; }
-.zoom-modal img { max-width: 100%; max-height: 88vh; object-fit: contain; border-radius: 12px; }
-.zoom-close { position: absolute; top: 18px; left: 18px; width: 40px; height: 40px; border: none; border-radius: 50%; background: rgba(255,255,255,.9); font-size: 20px; cursor: pointer; }
-.idle-nudge { position: fixed; left: 50%; bottom: 24px; z-index: 700; width: min(88vw, 330px); padding: 16px 18px; border-radius: 20px; background: rgba(13,54,34,.96); color: #fff; text-align: center; box-shadow: 0 12px 35px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transform: translate(-50%, 20px); transition: .28s ease; }
-.idle-nudge.show { opacity: 1; transform: translate(-50%, 0); }
-.idle-nudge strong { display: block; font-family:'Cairo',sans-serif; font-size: 15px; }
-.idle-nudge span { display: block; margin-top: 4px; color: #f5d991; font-size: 12px; }
+/* ══════════════════════════════════════
+   الأقسام الفرعية — شريط تابز ثابت + سكشنز جوا نفس صفحة القسم
+══════════════════════════════════════ */
+.products-wrap { background: var(--cream); }
+.section-tabs-bar {
+  position: sticky; top: 65px; z-index: 190;
+  background: var(--white); border-bottom: 1px solid var(--border);
+  display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  padding: 10px 14px; box-shadow: 0 2px 10px rgba(58,26,5,0.05);
+}
+.section-tabs-bar::-webkit-scrollbar { display: none; }
+.section-tab {
+  flex-shrink: 0; white-space: nowrap; cursor: pointer;
+  font-family: 'Tajawal', sans-serif; font-size: 12.5px; font-weight: 700;
+  color: var(--m-brown-m); background: var(--cream-d); border: 1.5px solid transparent;
+  padding: 8px 16px; border-radius: 20px; transition: background .2s, color .2s, border-color .2s, transform .2s;
+}
+.section-tab:active { transform: scale(0.96); }
+.section-tab.active {
+  background: linear-gradient(135deg, var(--orange), var(--orange-d));
+  color: var(--white); border-color: transparent;
+  box-shadow: 0 4px 12px rgba(230,57,70,0.28);
+}
+.section-block { scroll-margin-top: 112px; padding-top: 4px; }
+.section-block-title {
+  font-family: 'Cairo', sans-serif; font-size: 15.5px; font-weight: 800;
+  color: var(--m-brown); padding: 18px 14px 4px; max-width: 600px; margin: 0 auto; width: 100%;
+}
+.section-block:first-child .section-block-title { padding-top: 14px; }
 
 @media(max-width:400px) {
   .home-grid { gap: 12px; padding: 14px 12px 8px; }
@@ -754,7 +688,8 @@ img { -webkit-user-drag: none; }
 }
 .pd-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .pd-name { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 20px; color: var(--m-brown); line-height: 1.3; }
-.pd-price { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 20px; color: var(--green); white-space: nowrap; }
+.pd-price { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 20px; color: var(--green-d); white-space: nowrap; display: inline-flex; align-items: baseline; gap: 4px; }
+.pd-price .prod-currency { font-size: 12px; }
 .pd-meta-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
 .pd-rating { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--m-brown-m); }
 .pd-rating .stars { color: var(--star); letter-spacing: 1px; }
@@ -767,6 +702,14 @@ img { -webkit-user-drag: none; }
 .pd-nutri-value { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 15px; color: var(--m-brown); }
 .pd-nutri-label { font-size: 10.5px; color: var(--m-brown-l); margin-top: 2px; }
 .pd-desc { font-size: 13.5px; color: var(--m-brown-m); line-height: 1.7; margin-top: 4px; }
+.pd-sizeprices-list { display: flex; flex-direction: column; gap: 8px; }
+.pd-sizeprice-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--cream); border-radius: 12px; padding: 10px 14px;
+}
+.pd-sizeprice-name { font-size: 13px; font-weight: 700; color: var(--m-brown); }
+.pd-sizeprice-value { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 14.5px; color: var(--green-d); display: inline-flex; align-items: baseline; gap: 4px; }
+.pd-sizeprice-value .prod-currency { font-size: 10px; }
 .pd-chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 
 /* ══════════════════════════════════════
@@ -1961,6 +1904,8 @@ img { -webkit-user-drag: none; }
     padding: 22px 24px 50px;
   }
   .prod-card.tall { grid-column: auto; grid-row: auto; }
+  .section-tabs-bar { padding: 12px 24px; }
+  .section-block-title { max-width: 820px; padding: 20px 24px 4px; font-size: 17px; }
 }
 
 /* ══════════════════════════════════════
@@ -1994,6 +1939,9 @@ img { -webkit-user-drag: none; }
     padding: 34px 44px 70px;
   }
   .prod-card.tall { grid-column: auto; }
+  .section-tabs-bar { padding: 14px 44px; top: 74px; }
+  .section-block-title { max-width: 1180px; padding: 24px 44px 6px; }
+  .section-block { scroll-margin-top: 130px; }
 }
 
 /* شاشات ديسك توب واسعة فعلاً (مش تابلت) — نفس المنطق، حدود أعمدة أعرض شوية */
@@ -2200,9 +2148,7 @@ img { -webkit-user-drag: none; }
 
 <div id="kioskStartOverlay">
   <img src="logo.png" class="kiosk-start-logo" alt="Anwar Lebanon">
-  <div class="kiosk-start-kicker">Anwar Lebanon Bakery</div>
   <div class="kiosk-start-title">أنوار لبنان<br>مخبز وحلويات</div>
-  <div class="kiosk-start-sub">اختار اللي نفسك فيه</div>
   <button class="kiosk-start-btn" onclick="startKiosk()">بدء العرض</button>
 </div>
 
@@ -2224,11 +2170,7 @@ img { -webkit-user-drag: none; }
           <span class="kiosk-brand-text en">Anwar Lebanon</span>
         </span>
       </span>
-      <div class="kiosk-actions">
-        <button class="kiosk-action-btn" aria-label="البحث" onclick="openSearch()">⌕</button>
-        <button class="kiosk-action-btn" aria-label="المفضلات" onclick="openFavorites()">♡<span class="action-count" id="homeFavCount"></span></button>
-        <span class="kiosk-clock" id="kioskClock"></span>
-      </div>
+      <span class="kiosk-clock" id="kioskClock"></span>
     </div>
 
     <div class="menu-hero"></div>
@@ -2249,23 +2191,14 @@ img { -webkit-user-drag: none; }
       <div class="inner-back-btn" onclick="goHome()">→</div>
       <span class="inner-emoji" id="inner-emoji">🍯</span>
       <span class="inner-title" id="inner-title"></span>
-      <div class="inner-actions">
-        <button class="inner-action-btn" aria-label="البحث" onclick="openSearch()">⌕</button>
-        <button class="inner-action-btn" aria-label="المفضلات" onclick="openFavorites()">♡<span class="action-count" id="innerFavCount"></span></button>
-      </div>
     </div>
-    <div class="category-quick-nav" id="categoryQuickNav"></div>
     <div class="inner-banner-wrap">
       <img class="inner-banner" id="inner-banner" src="" alt="" loading="lazy" decoding="async"/>
       <div class="inner-banner-overlay">
         <span class="banner-tag" id="inner-tag"></span>
       </div>
     </div>
-    <div class="products-grid" id="products-grid"></div>
-    <section class="recent-section" id="recentViewedSection" style="display:none;">
-      <div class="recent-head"><div class="recent-title">شاهدتها مؤخرًا</div><div class="recent-sub">آخر اختياراتك</div></div>
-      <div class="recent-row" id="recentViewedRow"></div>
-    </section>
+    <div class="products-wrap" id="products-grid"></div>
   </div>
 
   <div class="menu-view" id="view-image">
@@ -2275,7 +2208,7 @@ img { -webkit-user-drag: none; }
       <span class="inner-title" id="image-title"></span>
     </div>
     <div class="image-menu-wrap">
-      <img class="image-menu-photo" id="image-menu-photo" src="" alt="" loading="lazy" decoding="async" onclick="openImageZoom()"/>
+      <img class="image-menu-photo" id="image-menu-photo" src="" alt="" loading="lazy" decoding="async"/>
     </div>
   </div>
 
@@ -2296,6 +2229,10 @@ img { -webkit-user-drag: none; }
         <div class="pd-rating"><span class="stars" id="pd-stars"></span><span id="pd-rating-num"></span></div>
       </div>
       <div id="pd-chips"></div>
+      <div id="pd-sizeprices-block" style="display:none;">
+        <div class="pd-section-label">الأحجام والأسعار</div>
+        <div class="pd-sizeprices-list" id="pd-sizeprices-list"></div>
+      </div>
       <div id="pd-nutrition-block" style="display:none;">
         <div class="pd-section-label">القيمة الغذائية</div>
         <div class="pd-nutrition-grid" id="pd-nutrition-grid"></div>
@@ -2305,51 +2242,6 @@ img { -webkit-user-drag: none; }
         <div class="pd-desc" id="pd-desc"></div>
       </div>
     </div>
-  </div>
-
-  <div class="kiosk-modal" id="productPreviewModal" role="dialog" aria-modal="true" aria-label="تفاصيل الصنف">
-    <div class="kiosk-sheet">
-      <button class="sheet-close" onclick="closeProduct()" aria-label="إغلاق">×</button>
-      <div class="preview-media" id="previewMedia" onclick="openPreviewZoom()">
-        <img id="previewImg" src="" alt="">
-        <span class="preview-zoom-hint">⤢ اضغط للتكبير</span>
-      </div>
-      <div class="preview-body">
-        <div class="preview-title-row">
-          <div class="preview-name" id="previewName"></div>
-          <div class="preview-price" id="previewPrice"></div>
-        </div>
-        <div class="preview-rating" id="previewRating"></div>
-        <div class="preview-chips" id="previewChips"></div>
-        <div class="preview-description" id="previewDescription"></div>
-        <button class="preview-fav-btn" id="previewFavBtn" onclick="toggleProductFav()">♡ أضف للمفضلات</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="kiosk-modal" id="searchModal" role="dialog" aria-modal="true" aria-label="البحث في المنيو">
-    <div class="kiosk-sheet search-sheet">
-      <div class="sheet-heading"><h3>بتدور على حاجة معينة؟</h3><button onclick="closeSearch()" aria-label="إغلاق">×</button></div>
-      <div class="menu-search-box">🔍<input id="menuSearchInput" type="search" autocomplete="off" placeholder="اكتب اسم الصنف..."></div>
-      <div class="menu-search-results" id="menuSearchResults"><div class="sheet-empty">اكتب اسم الصنف علشان تظهر النتائج</div></div>
-    </div>
-  </div>
-
-  <div class="kiosk-modal" id="favoritesModal" role="dialog" aria-modal="true" aria-label="المفضلات">
-    <div class="kiosk-sheet favorites-sheet">
-      <div class="sheet-heading"><h3>مفضلاتي <span id="favoritesTitleCount"></span></h3><button onclick="closeFavorites()" aria-label="إغلاق">×</button></div>
-      <div class="menu-search-results" id="favoritesResults"></div>
-    </div>
-  </div>
-
-  <div class="zoom-modal" id="imageZoomModal" role="dialog" aria-modal="true" aria-label="تكبير الصورة" onclick="closeZoom()">
-    <button class="zoom-close" onclick="closeZoom()" aria-label="إغلاق">×</button>
-    <img id="zoomImage" src="" alt="">
-  </div>
-
-  <div class="idle-nudge" id="idleNudge">
-    <strong>لسه بتتصفح؟</strong>
-    <span>المنيو هترجع للبداية خلال <b id="idleCountdown">15</b> ثانية</span>
   </div>
 
 </div>
@@ -2421,33 +2313,46 @@ img { -webkit-user-drag: none; }
 
 <div class="conn-status-dot" id="connStatusDot" title="حالة الاتصال"></div>
 
+<!-- ══════════════════════════════════════
+     FIX: window.openAdminOverlay must exist BEFORE kiosk-app.js runs.
+     Module scripts (type="module") are deferred and execute in document
+     order only AFTER the HTML has finished parsing — so the old approach
+     (defining window.openAdminOverlay inside the *last* module script)
+     meant kiosk-app.js's 3-tap check could run before that assignment
+     ever happened (or never happen at all if a Firebase import failed).
+     This plain, non-module <script> executes immediately, synchronously,
+     during parsing — guaranteeing it exists by the time any tap gesture
+     fires, regardless of module load order or network conditions.
+     There is exactly ONE definition of window.openAdminOverlay in the
+     whole file (this one) — the admin module script below only closes
+     the overlay, it no longer redefines it.
+══════════════════════════════════════ -->
+<script>
+  window.KIOSK_VIEWPORT = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+  window.openAdminOverlay = function () {
+    document.getElementById('adminOverlay').classList.add('show');
+    var scale = Math.min(1, (window.innerWidth || 1180) / 1180);
+    document.querySelector('meta[name="viewport"]').setAttribute(
+      'content', 'width=1180, initial-scale=' + scale + ', user-scalable=yes'
+    );
+  };
+</script>
 <script type="module" src="./firebase-app.js"></script>
 <script type="module" src="./kiosk-app.js"></script>
 <script type="module">
 import {
-  liveState, fetchMenuData, adminLogin, adminLogout, setCallbacks,
+  liveState, fetchMenuData, adminLogin, adminLogout,
   uploadMenuImage, createCategory, updateCategory, deleteCategory,
   createProduct, updateProduct, deleteProduct,
 } from "./firebase-app.js";
-/* ملحوظة: مفيش استيراد لـ getAuth/onAuthStateChanged هنا ولا تسجيل تاني للـ
-   auth state — firebase-app.js هو المصدر الوحيد لحالة تسجيل الدخول، وبيبلّغنا
-   عن طريق setCallbacks({ onAdminAuth }) تحت. ده بيمنع أي تعارض أو استعلام
-   Firestore مزدوج كان بيحصل قبل كده من وجود مستمعين منفصلين. */
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-/* ── فتح/قفل أوفرلاي الأدمن — بيفرض عرض ديسك توب حتى على الموبايل ── */
-const KIOSK_VIEWPORT = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
-const ADMIN_VIEWPORT = "width=1180, initial-scale=0.32, user-scalable=yes";
-function fitAdminViewport() {
-  const scale = Math.min(1, (window.innerWidth || 1180) / 1180);
-  document.querySelector('meta[name="viewport"]').setAttribute('content', `width=1180, initial-scale=${scale}, user-scalable=yes`);
-}
-window.openAdminOverlay = function () {
-  document.getElementById('adminOverlay').classList.add('show');
-  fitAdminViewport();
-};
+/* ── قفل أوفرلاي الأدمن ──
+   window.openAdminOverlay بقى معرّف مسبقًا في سكريبت مستقل فوق (قبل تحميل
+   الموديولز) عشان يضمن إنه موجود وقت الحاجة له بدون أي مشاكل ترتيب تحميل. */
 function closeAdminOverlay() {
   document.getElementById('adminOverlay').classList.remove('show');
-  document.querySelector('meta[name="viewport"]').setAttribute('content', KIOSK_VIEWPORT);
+  document.querySelector('meta[name="viewport"]').setAttribute('content', window.KIOSK_VIEWPORT);
   adminLogout();
 }
 document.getElementById('adminOverlayClose').addEventListener('click', closeAdminOverlay);
@@ -2468,64 +2373,31 @@ function escAttr(s) {
 }
 
 /* ── auth ── */
-
-/* رسائل عربية واضحة لأكواد أخطاء Firebase الشائعة، بدل رسالة واحدة ثابتة
-   كانت بتخفي السبب الحقيقي للفشل. */
-const AUTH_ERROR_MESSAGES = {
-  'auth/invalid-credential':     'الإيميل أو الباسورد غلط',
-  'auth/user-not-found':         'الإيميل أو الباسورد غلط',
-  'auth/wrong-password':         'الإيميل أو الباسورد غلط',
-  'auth/invalid-email':          'صيغة الإيميل مش صحيحة',
-  'auth/too-many-requests':      'محاولات كتير غلط — استنّي شوية وحاولي تاني',
-  'auth/network-request-failed': 'مفيش اتصال بالإنترنت — اتأكدي من الشبكة وحاولي تاني',
-};
-
-let loginInProgress = false;
 $('#loginBtn').onclick = async () => {
-  if (loginInProgress) return; // يمنع الدبل-كليك من إرسال أكتر من طلب دخول في نفس الوقت
   const email = $('#loginEmail').value.trim();
   const password = $('#loginPassword').value;
   const err = $('#loginErr');
-  const btn = $('#loginBtn');
-  err.textContent = '';
   if (!email || !password) { err.textContent = 'حط الإيميل والباسورد'; return; }
-
-  loginInProgress = true;
-  const originalLabel = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'جاري الدخول...';
   try {
     await adminLogin(email, password);
-    // نجاح الدخول بيوصل تلقائي عن طريق onAdminAuth callback تحت —
-    // مفيش داعي نلمس #loginScreen/#appRoot هنا.
   } catch (e) {
-    // نطبع الخطأ الحقيقي في الـ Console عشان نقدر نشخّص أي مشكلة فعلية
-    // (زي Email/Password provider مش مفعّل، أو مشكلة شبكة، إلخ)
-    console.error('فشل تسجيل دخول الأدمن:', e.code, e.message, e);
-    err.textContent = AUTH_ERROR_MESSAGES[e.code] || `حصل خطأ غير متوقع${e.code ? ' (' + e.code + ')' : ''} — حاولي تاني`;
-  } finally {
-    loginInProgress = false;
-    btn.disabled = false;
-    btn.textContent = originalLabel;
+    err.textContent = 'بيانات دخول غلط';
   }
 };
 $('#logoutBtn').onclick = () => { closeAdminOverlay(); };
 
-/* المصدر الوحيد لتحديث واجهة الأدمن بناءً على حالة تسجيل الدخول —
-   بيتنادى من firebase-app.js بعد ما liveState.isAdmin وliveState.categories/products
-   يتحدثوا فعلاً، فمفيش داعي نعمل fetchMenuData() تاني هنا. */
-function handleAdminAuthChange(user) {
+onAuthStateChanged(getAuth(), async (user) => {
   if (user) {
     $('#loginScreen').style.display = 'none';
     $('#appRoot').classList.add('show');
     $('#adminMailLabel').textContent = user.email || '';
+    await fetchMenuData();
     render();
   } else {
     $('#appRoot').classList.remove('show');
     $('#loginScreen').style.display = 'flex';
   }
-}
-setCallbacks({ onAdminAuth: handleAdminAuthChange });
+});
 
 /* ── nav / view state ── */
 let currentView = 'overview';
@@ -2591,4 +2463,222 @@ function renderOverview() {
   return `
     <div class="stats-grid">
       <div class="stat-card c1"><div class="ic">🗂️</div><div><div class="stat-num">${cats.length}</div><div class="stat-label">أقسام (${hiddenCats} مخفي)</div></div></div>
-      <div class="stat-card c2"><div class="ic">🧁</div><div><div class="stat-num">${products
+      <div class="stat-card c2"><div class="ic">🧁</div><div><div class="stat-num">${products.length}</div><div class="stat-label">أصناف (${hiddenProds} مخفي)</div></div></div>
+      <div class="stat-card c3"><div class="ic">💰</div><div><div class="stat-num">${withPrice}</div><div class="stat-label">أصناف بسعر</div></div></div>
+      <div class="stat-card c4"><div class="ic">📷</div><div><div class="stat-num">${products.length - withPrice}</div><div class="stat-label">من غير سعر</div></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>آخر الأقسام</h3><span class="cnt">${cats.length} إجمالي</span></div>
+      <table>
+        <thead><tr><th>القسم</th><th>عدد الأصناف</th><th>الحالة</th></tr></thead>
+        <tbody>
+          ${recentCats.map(c => `
+            <tr class="row">
+              <td><div class="cell-name"><img class="cell-thumb" src="${c.imageUrl}" alt=""/><div class="n">${escAttr(c.name)}</div></div></td>
+              <td>${(liveState.products[c.id] || []).length} صنف</td>
+              <td><span class="badge ${c.visible ? 'on' : 'off'}">${c.visible ? 'ظاهر' : 'مخفي'}</span></td>
+            </tr>`).join('') || `<tr class="empty-row"><td colspan="3">مفيش أقسام لسه</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function renderCategoriesTable() {
+  const q = searchTerm;
+  const cats = liveState.categories.filter(c => !q || (c.name || '').toLowerCase().includes(q));
+  return `
+    <div class="panel">
+      <div class="panel-head">
+        <h3>الأقسام الرئيسية</h3>
+        <button class="btn gold sm" id="addCatBtn">+ قسم جديد</button>
+      </div>
+      <table>
+        <thead><tr><th>القسم</th><th>النوع</th><th>عدد الأصناف</th><th>الحالة</th><th></th></tr></thead>
+        <tbody>
+          ${cats.map(c => `
+            <tr class="row">
+              <td><div class="cell-name"><img class="cell-thumb" src="${c.imageUrl}" alt=""/><div class="n">${escAttr(c.name)}</div></div></td>
+              <td>${c.displayType === 'image' ? 'صورة منيو' : (c.sections && c.sections.length ? `قسم أصناف (${c.sections.length} قسم فرعي)` : 'قسم أصناف')}</td>
+              <td>${(liveState.products[c.id] || []).length} صنف</td>
+              <td><span class="badge ${c.visible ? 'on' : 'off'}">${c.visible ? 'ظاهر' : 'مخفي'}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="icon-btn edit-cat" data-id="${c.id}">✏️</button>
+                  <button class="icon-btn del del-cat" data-id="${c.id}">🗑</button>
+                </div>
+              </td>
+            </tr>`).join('') || `<tr class="empty-row"><td colspan="5">مفيش أقسام مطابقة</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function catSubLabel(p) {
+  const cat = liveState.categories.find(c => c.id === p.categoryId);
+  if (!cat) return '';
+  if (p.sectionId && cat.sections) {
+    const sec = cat.sections.find(s => s.id === p.sectionId);
+    if (sec) return `${cat.name} ← ${sec.name}`;
+  }
+  return cat.name || '';
+}
+
+function renderProductsTable() {
+  const q = searchTerm;
+  const products = allProductsFlat().filter(p =>
+    (productCatFilter === 'all' || p.categoryId === productCatFilter) &&
+    (!q || (p.name || '').toLowerCase().includes(q))
+  );
+  const chips = [`<button class="chip-filter ${productCatFilter==='all'?'active':''}" data-cat="all">الكل</button>`]
+    .concat(liveState.categories.map(c => `<button class="chip-filter ${productCatFilter===c.id?'active':''}" data-cat="${c.id}">${escAttr(c.name)}</button>`));
+
+  return `
+    <div class="panel">
+      <div class="panel-head">
+        <h3>كل الأصناف</h3>
+        <button class="btn gold sm" id="addProdBtn">+ صنف جديد</button>
+      </div>
+      <div class="cat-filter-row">${chips.join('')}</div>
+      <table style="margin-top:14px;">
+        <thead><tr><th>الصنف</th><th>السعر</th><th>التقييم</th><th>الحالة</th><th></th></tr></thead>
+        <tbody>
+          ${products.map(p => `
+            <tr class="row">
+              <td><div class="cell-name"><img class="cell-thumb" src="${p.imageUrl}" alt=""/><div><div class="n">${escAttr(p.name)}</div><div class="s">${escAttr(catSubLabel(p))}</div></div></div></td>
+              <td>${p.sizePrices && p.sizePrices.length
+                  ? `<span class="price-tag">${p.sizePrices.map(s => `${escAttr(s.name)}: ${s.price}`).join(' / ')}</span>`
+                  : (p.price != null ? `<span class="price-tag">${p.price} AED</span>` : `<span class="price-tag na">—</span>`)}</td>
+              <td>${p.rating != null ? `⭐ ${p.rating}` : '—'}</td>
+              <td><span class="badge ${p.visible ? 'on' : 'off'}">${p.visible ? 'ظاهر' : 'مخفي'}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="icon-btn edit-prod" data-id="${p.id}">✏️</button>
+                  <button class="icon-btn del del-prod" data-id="${p.id}">🗑</button>
+                </div>
+              </td>
+            </tr>`).join('') || `<tr class="empty-row"><td colspan="5">مفيش أصناف مطابقة</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function wireContentEvents() {
+  $('#addCatBtn')?.addEventListener('click', () => openCategoryDrawer(null));
+  $$('.edit-cat').forEach(b => b.addEventListener('click', () => openCategoryDrawer(b.dataset.id)));
+  $$('.del-cat').forEach(b => b.addEventListener('click', () => handleDeleteCategory(b.dataset.id)));
+
+  $('#addProdBtn')?.addEventListener('click', () => openProductDrawer(null));
+  $$('.edit-prod').forEach(b => b.addEventListener('click', () => openProductDrawer(b.dataset.id)));
+  $$('.del-prod').forEach(b => b.addEventListener('click', () => handleDeleteProduct(b.dataset.id)));
+
+  $$('.chip-filter').forEach(b => b.addEventListener('click', () => {
+    productCatFilter = b.dataset.cat;
+    renderContentOnly();
+  }));
+}
+
+async function refreshAndRerender() {
+  await fetchMenuData();
+  renderContentOnly();
+}
+
+/* ── delete handlers ── */
+async function handleDeleteCategory(id) {
+  if (!confirm('تأكيد حذف القسم ده وكل أصنافه؟')) return;
+  const items = liveState.products[id] || [];
+  for (const it of items) await deleteProduct(it.id);
+  await deleteCategory(id);
+  showToast('🗑 اتحذف القسم');
+  await refreshAndRerender();
+}
+async function handleDeleteProduct(id) {
+  if (!confirm('تأكيد حذف الصنف؟')) return;
+  await deleteProduct(id);
+  showToast('🗑 اتحذف الصنف');
+  await refreshAndRerender();
+}
+
+/* ── drawer ── */
+const backdrop = $('#drawerBackdrop');
+$('#drawerClose').onclick = closeDrawer;
+$('#drawerCancel').onclick = closeDrawer;
+backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeDrawer(); });
+function closeDrawer() { backdrop.classList.remove('show'); }
+function openDrawer(title) { $('#drawerTitle').textContent = title; backdrop.classList.add('show'); }
+
+let pendingImageFile = null;
+
+/* ── توليد معرف بسيط للأقسام الفرعية/أحجام الأسعار ── */
+function makeLocalId() {
+  return 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function openCategoryDrawer(id) {
+  const cat = id ? liveState.categories.find(c => c.id === id) : null;
+  pendingImageFile = null;
+  let pendingSections = cat && cat.sections ? cat.sections.map(s => ({ ...s })) : [];
+  openDrawer(cat ? 'تعديل القسم' : 'قسم جديد');
+  $('#drawerBody').innerHTML = `
+    <div class="field">
+      <label>صورة القسم</label>
+      <div class="img-upload">
+        <img id="dImgPreview" src="${cat ? cat.imageUrl : ''}" alt=""/>
+        <label>📷 اختاري صورة<input type="file" id="dImgInput" accept="image/*" style="display:none;"/></label>
+      </div>
+    </div>
+    <div class="field"><label>اسم القسم</label><input id="dName" value="${escAttr(cat?.name || '')}"/></div>
+    <div class="toggle-field field">
+      <span style="font-size:13px;font-weight:700;color:var(--text-mid);">ظاهر في المنيو</span>
+      <label class="toggle"><input type="checkbox" id="dVisible" ${cat ? (cat.visible ? 'checked':'') : 'checked'}/><span class="track"></span></label>
+    </div>
+    <div class="field">
+      <label>أقسام فرعية (اختياري)</label>
+      <div class="field-hint" style="margin:-2px 0 10px;">لو القسم كبير وعايز تقسمه لأقسام جوا بعض (زي: فطاير أجبان، فطاير لحوم...)، ضيفهم هنا. لما يكون فيه أقسام فرعية، هيظهر شريط تابز في صفحة القسم في الموقع.</div>
+      <div id="sectionsList"></div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <input id="newSectionName" placeholder="اسم القسم الفرعي..."
+          style="flex:1; padding:11px 13px; border:1.5px solid var(--line); border-radius:10px; font-size:13.5px; background:#FBFAF7;"/>
+        <button class="btn ghost sm" id="addSectionBtn" type="button">+ إضافة</button>
+      </div>
+    </div>`;
+
+  function renderSectionsList() {
+    const list = $('#sectionsList');
+    if (!pendingSections.length) {
+      list.innerHTML = `<div class="field-hint">مفيش أقسام فرعية دلوقتي</div>`;
+      return;
+    }
+    list.innerHTML = pendingSections.map((s, i) => `
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <input data-idx="${i}" class="sec-name-input" value="${escAttr(s.name)}"
+          style="flex:1; padding:11px 13px; border:1.5px solid var(--line); border-radius:10px; font-size:13.5px; background:#FBFAF7;"/>
+        <button class="icon-btn del sec-remove-btn" data-idx="${i}" type="button">🗑</button>
+      </div>`).join('');
+    list.querySelectorAll('.sec-name-input').forEach(inp => {
+      inp.addEventListener('input', (e) => { pendingSections[+e.target.dataset.idx].name = e.target.value; });
+    });
+    list.querySelectorAll('.sec-remove-btn').forEach(btn => {
+      btn.addEventListener('click', () => { pendingSections.splice(+btn.dataset.idx, 1); renderSectionsList(); });
+    });
+  }
+  renderSectionsList();
+
+  $('#addSectionBtn').addEventListener('click', () => {
+    const name = $('#newSectionName').value.trim();
+    if (!name) { showToast('⚠️ حطي اسم القسم الفرعي الأول'); return; }
+    pendingSections.push({ id: makeLocalId(), name });
+    $('#newSectionName').value = '';
+    renderSectionsList();
+  });
+
+  $('#dImgInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    pendingImageFile = file;
+    $('#dImgPreview').src = URL.createObjectURL(file);
+  });
+
+  $('#drawerSave').onclick = async () => {
+    const name = $('#dName').value.trim();
+    if (!name) { showToast('⚠️ حطي اسم القسم'); return; }
+    const cleanSections = pendingSections.filter(s => s.name.trim()).
