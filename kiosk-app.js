@@ -456,21 +456,38 @@ function setupLogoTapGesture() {
     }
   }
 
-  if (window.PointerEvent) {
-    // Pointer Events cover mouse, touch, and pen in a single unified event,
-    // so one 'pointerup' listener is enough — no separate 'click' listener
-    // is needed. Mixing 'click' with pointer events was what caused one
-    // physical tap to sometimes be counted twice (once for the touch/pointer
-    // event, once for the browser's emulated click that follows it).
-    logoEl.addEventListener('pointerup', (e) => {
-      // Ignore non-primary mouse buttons (e.g. right-click) as a tap.
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
-      registerLogoTap();
-    });
-  } else {
-    // Fallback for older browsers without Pointer Events support.
-    logoEl.addEventListener('click', registerLogoTap);
-  }
+  // Some embedded/older tablet browsers expose `window.PointerEvent` but
+  // don't reliably dispatch pointer events, so we can't just trust feature
+  // detection alone. Instead we listen for BOTH 'pointerup' (best for
+  // touchscreens) and 'click' (always supported), and use a short-lived
+  // flag to swallow the 'click' that a browser fires right after a
+  // pointerup for the same physical tap. This means:
+  //  - If pointerup fires correctly -> it counts the tap, and the
+  //    following click (if any) is ignored, so the tap isn't counted twice.
+  //  - If pointerup never fires on a given device -> the plain click still
+  //    counts the tap, so the gesture keeps working either way.
+  let suppressNextClick = false;
+  let suppressResetTimer = null;
+
+  logoEl.addEventListener('pointerup', (e) => {
+    // Ignore non-primary mouse buttons (e.g. right-click) as a tap.
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    suppressNextClick = true;
+    if (suppressResetTimer) clearTimeout(suppressResetTimer);
+    // Safety valve: if no 'click' follows (varies by browser), don't let a
+    // stuck flag block a later, unrelated tap.
+    suppressResetTimer = setTimeout(() => { suppressNextClick = false; }, 400);
+    registerLogoTap();
+  });
+
+  logoEl.addEventListener('click', () => {
+    if (suppressNextClick) {
+      suppressNextClick = false;
+      if (suppressResetTimer) { clearTimeout(suppressResetTimer); suppressResetTimer = null; }
+      return; // this click is just the compatibility echo of the pointerup above
+    }
+    registerLogoTap();
+  });
 }
 
 // The logo element may not exist yet if this script runs before the DOM
