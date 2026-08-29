@@ -47,10 +47,12 @@ export const liveState = {
 let pollTimer = null;
 let onDataRefreshed = () => {}; // بتتحدد من الملف الرئيسي بعد ما يجهز الـ DOM
 let onConnectionChange = () => {};
+let onAdminAuthChange = () => {}; // بتتحدد من index.html — استدعاء واحد بس بعد ما liveState.isAdmin يتحدث
 
-export function setCallbacks({ onRefresh, onConnection }) {
+export function setCallbacks({ onRefresh, onConnection, onAdminAuth }) {
   if (onRefresh) onDataRefreshed = onRefresh;
   if (onConnection) onConnectionChange = onConnection;
+  if (onAdminAuth) onAdminAuthChange = onAdminAuth;
 }
 
 /* ══════════════════════════════════════
@@ -125,10 +127,17 @@ export async function adminLogout() {
   await signOut(auth);
 }
 
+/* ══════════════════════════════════════
+   المصدر الوحيد لحالة تسجيل دخول الأدمن.
+   index.html ما بيعملش onAuthStateChanged بتاعه — بيسجل نفسه هنا
+   عن طريق setCallbacks({ onAdminAuth }) عشان نتجنب أي تعارض/ازدواجية
+   في التعامل مع حالة الـ auth.
+══════════════════════════════════════ */
 onAuthStateChanged(auth, async (user) => {
   liveState.isAdmin = !!user;
   if (idleLogoutTimer) clearTimeout(idleLogoutTimer);
   await fetchMenuData(); // إعادة تحميل بصلاحيات مختلفة (يشوف المخفي لو أدمن)
+  onAdminAuthChange(user); // نبلّغ الواجهة بعد ما البيانات والصلاحية اتحدثوا فعلاً
 });
 
 /* ══════════════════════════════════════
