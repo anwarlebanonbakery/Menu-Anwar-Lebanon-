@@ -114,14 +114,11 @@ function renderHomeGrid() {
 }
 
 /* ── أصناف بسعر واحد أو بأحجام (وسط/كبير...) ── */
-function lowestSizePrice(item) {
-  if (!item.sizePrices || !item.sizePrices.length) return null;
-  return item.sizePrices.reduce((min, s) => (s.price != null && (min === null || s.price < min) ? s.price : min), null);
-}
 function buildPriceHTML(item) {
   if (item.sizePrices && item.sizePrices.length) {
-    const min = lowestSizePrice(item);
-    return `<div class="prod-price"><span class="prod-currency">من </span>${min}<span class="prod-currency"> AED</span></div>`;
+    return `<div class="prod-sizeprice-row">${item.sizePrices.map(s =>
+      `<span class="prod-sizeprice-chip"><span class="sz-name">${s.name}</span><span class="sz-val">${s.price}</span></span>`
+    ).join('')}</div>`;
   }
   if (item.price !== undefined && item.price !== null)
     return `<div class="prod-price"><span class="prod-currency">AED </span>${item.price}</div>`;
@@ -129,8 +126,8 @@ function buildPriceHTML(item) {
 }
 function buildBadgeHTML(item) {
   if (item.sizePrices && item.sizePrices.length) {
-    const min = lowestSizePrice(item);
-    return `<div class="prod-badge">من ${min} AED</div>`;
+    // في وضع الأحجام المتعددة، الأسعار كاملة بتتعرض تحت اسم الصنف بوضوح (وسط/كبير)، فمفيش داعي لبادچ ملخّص فوق الصورة ممكن يوهم إنه سعر واحد
+    return '';
   }
   if (item.price !== undefined && item.price !== null)
     return `<div class="prod-badge">${item.price} AED</div>`;
@@ -315,7 +312,7 @@ function openProduct(id) {
   document.getElementById('pd-name').textContent = item.name;
   const hasSizePrices = item.sizePrices && item.sizePrices.length;
   document.getElementById('pd-price').textContent = hasSizePrices
-    ? `من ${lowestSizePrice(item)} AED`
+    ? item.sizePrices.map(s => `${s.name} ${s.price}`).join(' / ') + ' AED'
     : ((item.price !== undefined && item.price !== null) ? `${item.price} AED` : '—');
 
   const sizePricesBlock = document.getElementById('pd-sizeprices-block');
