@@ -141,7 +141,7 @@ let sectionObserver = null;
 function buildProductCard(item) {
   const card = document.createElement('div');
   card.className = 'prod-card' + (item.wide ? ' wide' : '') + (item.tall ? ' tall' : '');
-  card.onclick = () => openProduct(item.id);
+  card.onclick = () => openImageMenu(item.imageUrl, item.name);
   let extras = '';
   if (item.sizes && item.sizes.length) extras += `<div class="prod-sizes">${item.sizes.map(s => `<span class="prod-size-chip">${s}</span>`).join('')}</div>`;
   if (item.flavors && item.flavors.length) extras += `<div class="prod-flavors">${item.flavors.map(f => `<span class="prod-flavor-chip">${f}</span>`).join('')}</div>`;
@@ -160,7 +160,6 @@ function buildProductCard(item) {
       </div>
       <div class="prod-price-row">
         ${buildPriceHTML(item)}
-        <div class="prod-heart">🤍</div>
       </div>
     </div>`;
   return card;
