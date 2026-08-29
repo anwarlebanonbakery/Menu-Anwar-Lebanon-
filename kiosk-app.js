@@ -74,13 +74,18 @@ function fitGridColumns(grid, itemCount, minCardPx) {
   const innerWidth = grid.clientWidth - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0);
   let maxCols = Math.max(1, Math.floor((innerWidth + gap) / (minCardPx + gap)));
   maxCols = Math.min(maxCols, itemCount);
-  let cols = maxCols;
-  while (cols > 2) {
+  const minCols = Math.min(maxCols, 2);
+
+  // دوري على عدد أعمدة يقسم العدد بالظبط (صفر فراغ)، وإلا اختاري اللي بيسيب أقل فراغ في الصف الأخير
+  let best = maxCols;
+  let bestGapSlots = (maxCols - (itemCount % maxCols)) % maxCols;
+  for (let cols = maxCols; cols >= minCols; cols--) {
     const remainder = itemCount % cols;
-    if (remainder === 0 || remainder >= Math.ceil(cols / 2)) break;
-    cols--;
+    const gapSlots = remainder === 0 ? 0 : cols - remainder;
+    if (gapSlots < bestGapSlots) { best = cols; bestGapSlots = gapSlots; }
+    if (gapSlots === 0) { best = cols; bestGapSlots = 0; break; }
   }
-  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  grid.style.gridTemplateColumns = `repeat(${best}, 1fr)`;
 }
 
 function renderHomeGrid() {
