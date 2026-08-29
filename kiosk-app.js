@@ -431,17 +431,47 @@ resetKioskIdleTimer();
 /* ══════════════════════════════════════
    دخول الأدمن — 3 لمسات على اللوجو تفتح لوحة التحكم المنفصلة
 ══════════════════════════════════════ */
-let logoTapCount = 0;
-let logoTapTimer = null;
-document.getElementById('logoTapTarget').addEventListener('click', () => {
-  logoTapCount++;
-  if (logoTapTimer) clearTimeout(logoTapTimer);
-  logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 1500);
-  if (logoTapCount >= 3) {
-    logoTapCount = 0;
-    if (window.openAdminOverlay) window.openAdminOverlay();
+(function setupLogoTapGesture() {
+  const logoEl = document.getElementById('logoTapTarget');
+  if (!logoEl) return; // element must exist before attaching the listener
+
+  // Prevent duplicate listeners if this script/init runs more than once.
+  if (logoEl.dataset.tapGestureAttached === 'true') return;
+  logoEl.dataset.tapGestureAttached = 'true';
+
+  let logoTapCount = 0;
+  let logoTapTimer = null;
+
+  function registerLogoTap() {
+    logoTapCount++;
+    if (logoTapTimer) clearTimeout(logoTapTimer);
+    logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 1500);
+
+    if (logoTapCount >= 3) {
+      logoTapCount = 0;
+      if (logoTapTimer) { clearTimeout(logoTapTimer); logoTapTimer = null; }
+      if (typeof window.openAdminOverlay === 'function') {
+        window.openAdminOverlay();
+      }
+    }
   }
-});
+
+  if (window.PointerEvent) {
+    // Pointer Events cover mouse, touch, and pen in a single unified event,
+    // so one 'pointerup' listener is enough — no separate 'click' listener
+    // is needed. Mixing 'click' with pointer events was what caused one
+    // physical tap to sometimes be counted twice (once for the touch/pointer
+    // event, once for the browser's emulated click that follows it).
+    logoEl.addEventListener('pointerup', (e) => {
+      // Ignore non-primary mouse buttons (e.g. right-click) as a tap.
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      registerLogoTap();
+    });
+  } else {
+    // Fallback for older browsers without Pointer Events support.
+    logoEl.addEventListener('click', registerLogoTap);
+  }
+})();
 
 /* ══════════════════════════════════════
    البداية
