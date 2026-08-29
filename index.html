@@ -583,21 +583,20 @@ img { -webkit-user-drag: none; }
 .prod-flavor-chip { background: var(--cream); border: 1px solid var(--cream-d); color: var(--m-brown-m); font-size: 10.5px; padding: 2px 7px; border-radius: 8px; }
 .prod-sizes { display: flex; gap: 5px; margin-bottom: 6px; }
 .prod-size-chip { background: linear-gradient(135deg, var(--orange-d), var(--orange)); color: white; font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 10px; }
-.prod-price-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.prod-price-row { display: flex; align-items: center; }
 .prod-price { font-family: 'Cairo', sans-serif; font-size: 16px; font-weight: 900; color: var(--green-d); display: inline-flex; align-items: baseline; gap: 3px; }
 .prod-price.dash { color: #bbb; font-size: 18px; letter-spacing: 1px; }
 .prod-currency { font-size: 10px; font-weight: 700; color: var(--m-brown-l); letter-spacing: 0.3px; }
 
-/* أسعار الأحجام المتعددة (وسط/كبير...) داخل كارت الصنف */
-.prod-sizeprice-row { display: flex; flex-wrap: wrap; gap: 5px; }
+/* أسعار الأحجام المتعددة (وسط/كبير...) داخل كارت الصنف — جنب بعض في نفس السطر */
+.prod-sizeprice-row { display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.prod-sizeprice-row::-webkit-scrollbar { display: none; }
 .prod-sizeprice-chip {
-  display: inline-flex; align-items: baseline; gap: 4px;
-  background: var(--green-pastel); border-radius: 10px; padding: 4px 8px 4px 9px;
+  display: inline-flex; align-items: baseline; gap: 3px; flex-shrink: 0;
+  background: var(--green-pastel); border-radius: 10px; padding: 4px 7px 4px 8px;
 }
-.prod-sizeprice-chip .sz-name { font-size: 10px; font-weight: 700; color: var(--m-brown-l); }
-.prod-sizeprice-chip .sz-val { font-family: 'Cairo', sans-serif; font-size: 12.5px; font-weight: 900; color: var(--green-d); }
-.prod-heart { width: 28px; height: 28px; border-radius: 50%; background: var(--cream); border: 1px solid var(--cream-d); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: transform .2s; }
-.prod-heart:hover { transform: scale(1.2); }
+.prod-sizeprice-chip .sz-name { font-size: 9.5px; font-weight: 700; color: var(--m-brown-l); }
+.prod-sizeprice-chip .sz-val { font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 900; color: var(--green-d); white-space: nowrap; }
 .manaesh-types { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
 .manaesh-chip { background: var(--cream); border: 1px solid var(--cream-d); color: var(--m-brown-m); font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 10px; white-space: nowrap; }
 
@@ -2688,4 +2687,7 @@ function openCategoryDrawer(id) {
   };
 }
 
-function openProd
+function openProductDrawer(id) {
+  const item = id ? allProductsFlat().find(p => p.id === id) : null;
+  pendingImageFile = null;
+  const catOptions = liveState.categories.m
