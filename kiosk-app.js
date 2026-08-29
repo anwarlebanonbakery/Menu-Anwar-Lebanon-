@@ -7,23 +7,6 @@ import {
   liveState, setCallbacks, fetchMenuData, startPolling,
 } from "./firebase-app.js";
 
-/* ── TEMP DEBUG: catch any script error so it's visible without DevTools ──
-   Safe to remove once the logo tap gesture is confirmed working live. */
-window.addEventListener('error', (e) => {
-  let box = document.getElementById('__tapDebugBox');
-  if (!box) {
-    box = document.createElement('div');
-    box.id = '__tapDebugBox';
-    box.style.cssText = 'position:fixed;top:8px;left:8px;right:8px;z-index:99999;' +
-      'background:rgba(0,0,0,0.85);color:#0f0;font:12px monospace;padding:8px 10px;' +
-      'border-radius:8px;max-height:140px;overflow:auto;white-space:pre-wrap;pointer-events:none;';
-    document.body.appendChild(box);
-  }
-  const t = new Date().toLocaleTimeString('en-GB', { hour12: false });
-  box.style.color = '#f55';
-  box.textContent = `[${t}] ❌ JS ERROR: ${e.message} (${e.filename}:${e.lineno})\n` + box.textContent;
-});
-
 /* ── الساعة ── */
 function updateKioskClock() {
   const el = document.getElementById('kioskClock');
@@ -455,40 +438,17 @@ function setupLogoTapGesture() {
   if (logoEl.dataset.tapGestureAttached === 'true') return;
   logoEl.dataset.tapGestureAttached = 'true';
 
-  /* ── TEMP DEBUG: on-screen toast so we can see taps without DevTools ──
-     Safe to remove once the gesture is confirmed working live. */
-  function debugToast(msg) {
-    let box = document.getElementById('__tapDebugBox');
-    if (!box) {
-      box = document.createElement('div');
-      box.id = '__tapDebugBox';
-      box.style.cssText = 'position:fixed;top:8px;left:8px;right:8px;z-index:99999;' +
-        'background:rgba(0,0,0,0.85);color:#0f0;font:12px monospace;padding:8px 10px;' +
-        'border-radius:8px;max-height:140px;overflow:auto;white-space:pre-wrap;pointer-events:none;';
-      document.body.appendChild(box);
-    }
-    const t = new Date().toLocaleTimeString('en-GB', { hour12: false });
-    box.textContent = `[${t}] ${msg}\n` + box.textContent;
-  }
-
-  // Shows immediately on page load (before any tap) so we can confirm this
-  // exact script version is the one actually running on the page.
-  debugToast('✅ سكريبت اللمسات (نسخة تشخيص) اتحمّل وجاهز');
-  logoEl.style.outline = '3px solid red';
-
   let logoTapCount = 0;
   let logoTapTimer = null;
 
-  function registerLogoTap(source) {
+  function registerLogoTap() {
     logoTapCount++;
-    debugToast(`لمسة #${logoTapCount} (${source})`);
     if (logoTapTimer) clearTimeout(logoTapTimer);
     logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 1500);
 
     if (logoTapCount >= 3) {
       logoTapCount = 0;
       if (logoTapTimer) { clearTimeout(logoTapTimer); logoTapTimer = null; }
-      debugToast('وصلنا 3 - openAdminOverlay موجودة؟ ' + (typeof window.openAdminOverlay === 'function'));
       if (typeof window.openAdminOverlay === 'function') {
         window.openAdminOverlay();
       }
@@ -516,7 +476,7 @@ function setupLogoTapGesture() {
     // Safety valve: if no 'click' follows (varies by browser), don't let a
     // stuck flag block a later, unrelated tap.
     suppressResetTimer = setTimeout(() => { suppressNextClick = false; }, 400);
-    registerLogoTap('pointerup:' + e.pointerType);
+    registerLogoTap();
   });
 
   logoEl.addEventListener('click', () => {
@@ -525,7 +485,7 @@ function setupLogoTapGesture() {
       if (suppressResetTimer) { clearTimeout(suppressResetTimer); suppressResetTimer = null; }
       return; // this click is just the compatibility echo of the pointerup above
     }
-    registerLogoTap('click');
+    registerLogoTap();
   });
 }
 
