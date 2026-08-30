@@ -2255,7 +2255,7 @@ img { -webkit-user-drag: none; }
   <div class="login-card">
     <div class="brand-mark">🥐</div>
     <h1>لوحة تحكم أنوار لبنان</h1>
-    <div class="sub">سجلي دخول بحساب الأدمن</div>
+    <div class="sub">سجل دخول بحساب الأدمن</div>
     <input id="loginEmail" type="email" placeholder="الإيميل"/>
     <input id="loginPassword" type="password" placeholder="الباسورد"/>
     <div class="login-err" id="loginErr"></div>
@@ -2378,10 +2378,21 @@ $('#loginBtn').onclick = async () => {
   const password = $('#loginPassword').value;
   const err = $('#loginErr');
   if (!email || !password) { err.textContent = 'حط الإيميل والباسورد'; return; }
+  err.textContent = '';
   try {
     await adminLogin(email, password);
   } catch (e) {
-    err.textContent = 'بيانات دخول غلط';
+    console.error('Admin login failed:', e.code, e.message);
+    const map = {
+      'auth/invalid-email': 'صيغة الإيميل غلط',
+      'auth/user-not-found': 'مفيش حساب بالإيميل ده',
+      'auth/wrong-password': 'الباسورد غلط',
+      'auth/invalid-credential': 'الإيميل أو الباسورد غلط',
+      'auth/too-many-requests': 'محاولات كتير غلط — استنى شوية وجرب تاني',
+      'auth/unauthorized-domain': 'الدومين ده مش مسموح له يسجل دخول (لازم يتضاف في Firebase Console)',
+      'auth/network-request-failed': 'مفيش اتصال بالإنترنت',
+    };
+    err.textContent = map[e.code] || ('حصل خطأ: ' + (e.code || e.message));
   }
 };
 $('#logoutBtn').onclick = () => { closeAdminOverlay(); };
@@ -2623,7 +2634,7 @@ function openCategoryDrawer(id) {
       <label>صورة القسم</label>
       <div class="img-upload">
         <img id="dImgPreview" src="${cat ? cat.imageUrl : ''}" alt=""/>
-        <label>📷 اختاري صورة<input type="file" id="dImgInput" accept="image/*" style="display:none;"/></label>
+        <label>📷 اختار صورة<input type="file" id="dImgInput" accept="image/*" style="display:none;"/></label>
       </div>
     </div>
     <div class="field"><label>اسم القسم</label><input id="dName" value="${escAttr(cat?.name || '')}"/></div>
@@ -2665,20 +2676,4 @@ function openCategoryDrawer(id) {
 
   $('#addSectionBtn').addEventListener('click', () => {
     const name = $('#newSectionName').value.trim();
-    if (!name) { showToast('⚠️ حطي اسم القسم الفرعي الأول'); return; }
-    pendingSections.push({ id: makeLocalId(), name });
-    $('#newSectionName').value = '';
-    renderSectionsList();
-  });
-
-  $('#dImgInput').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    pendingImageFile = file;
-    $('#dImgPreview').src = URL.createObjectURL(file);
-  });
-
-  $('#drawerSave').onclick = async () => {
-    const name = $('#dName').value.trim();
-    if (!name) { showToast('⚠️ حطي اسم القسم'); return; }
-    const cleanSections = pendingSections.filter(s => s.name.trim())
+    if (!name) { showToa
