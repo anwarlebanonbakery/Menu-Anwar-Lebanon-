@@ -68,10 +68,14 @@ function countLabel(cat) {
   return n + ' صنف';
 }
 
-/* ── تقسيم الأعمدة ديناميكيًا حسب المساحة وعدد العناصر (يمنع صف أخير فاضي) ── */
+/* ── تقسيم الأعمدة ديناميكيًا حسب المساحة وعدد العناصر (يمنع صف أخير فاضي) ──
+   ملحوظة: من موبايل لحد آخر مقاس آيباد (لغاية 1499px) الـCSS هو اللي بيتحكم
+   في عدد الأعمدة (3 بورتريه / 4 لاندسكيب) — الدالة دي بتشتغل بس على الديسك
+   توب الحقيقي (1500px فأكتر) عشان الجافاسكريبت مايكتبش فوق الـCSS ويبهدل
+   الشبكة لما الآيباد يتلف. */
 function fitGridColumns(grid, itemCount, minCardPx) {
   if (!grid || itemCount === 0) return;
-  if (window.innerWidth < 600) { grid.style.gridTemplateColumns = ''; return; } // موبايل: سيب الـ CSS الثابت
+  if (window.innerWidth < 1500) { grid.style.gridTemplateColumns = ''; return; } // موبايل + آيباد: سيب الـ CSS الثابت
   const cs = getComputedStyle(grid);
   const gap = parseFloat(cs.columnGap) || 20;
   const innerWidth = grid.clientWidth - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0);
