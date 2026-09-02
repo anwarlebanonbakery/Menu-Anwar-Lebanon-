@@ -385,6 +385,8 @@ function renderSectionedCategory(wrap, cat, items) {
    عروضنا + حلويات غربية يستخدمان نفس تجربة المعرض.
 ══════════════════════════════════════ */
 let galleryObserver = null;
+let offersCountdownTimer = null;
+let offersState = null;
 
 const SECTION_PHRASES = {
   gallery: 'لحظات حلوة… تُرى قبل أن تُذاق.',
